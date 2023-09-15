@@ -1,3 +1,11 @@
-resolver: lts-20.26
+resolver: lts-21.12
 packages:
 - .
+extra-deps:
+- beam-core-0.10.1.0
+- mysql-haskell-1.1.2
+- crypton-x509-1.7.6
+- crypton-x509-store-1.6.9
+- crypton-x509-system-1.6.7
+- crypton-x509-validation-1.6.12
+- tls-1.7.1
