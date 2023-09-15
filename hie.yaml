@@ -1,0 +1,7 @@
+cradle:
+  stack:
+    - path: "./src"
+      component: "beam-mysql-haskell:lib"
+
+    - path: "./test"
+      component: "beam-mysql-haskell:test:beam-mysql-haskell-test"
