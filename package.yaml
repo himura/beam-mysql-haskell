@@ -1,0 +1,71 @@
+name:                beam-mysql-haskell
+version:             0.10.0.0
+github:              "himura/beam-mysql-haskell"
+license:             MIT
+license-file:        LICENSE
+author:              "Takahiro Himura"
+maintainer:          "taka@himura.jp"
+copyright:           "2023 Takahiro Himura"
+synopsis:            Beam driver for mysql-haskell
+description:         Beam driver for the MySQL database with the pure haskell driver <https://hackage.haskell.org/package/mysql-haskell mysql-haskell>.
+                     Please see the README on GitHub at <https://github.com/himura/beam-mysql-haskell#readme>
+category:            Database
+
+extra-source-files:
+- README.md
+- CHANGELOG.md
+
+dependencies:
+- base >= 4.10 && < 5
+
+language: GHC2021
+
+default-extensions:
+- DataKinds
+- DefaultSignatures
+- DeriveAnyClass
+- DerivingStrategies
+- DerivingVia
+- DuplicateRecordFields
+- FunctionalDependencies
+- GADTs
+- LambdaCase
+- MultiWayIf
+- OverloadedLabels
+- OverloadedRecordDot
+- OverloadedStrings
+- PackageImports
+- QuasiQuotes
+- RecordWildCards
+- StrictData
+- TypeFamilies
+
+ghc-options:
+- -Wall
+- -Wcompat
+- -Widentities
+- -Wincomplete-record-updates
+- -Wincomplete-uni-patterns
+- -Wmissing-export-lists
+- -Wmissing-home-modules
+- -Wpartial-fields
+- -Wredundant-constraints
+
+library:
+  source-dirs: src
+  ghc-options:
+  - -Werror
+
+tests:
+  beam-mysql-haskell-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - beam-mysql-haskell
+    - tasty
+    - tasty-th
+    - tasty-hunit

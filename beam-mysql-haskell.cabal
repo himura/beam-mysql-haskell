@@ -1,0 +1,92 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.35.2.
+--
+-- see: https://github.com/sol/hpack
+
+name:           beam-mysql-haskell
+version:        0.10.0.0
+synopsis:       Beam driver for mysql-haskell
+description:    Beam driver for the MySQL database with the pure haskell driver <https://hackage.haskell.org/package/mysql-haskell mysql-haskell>. Please see the README on GitHub at <https://github.com/himura/beam-mysql-haskell#readme>
+category:       Database
+homepage:       https://github.com/himura/beam-mysql-haskell#readme
+bug-reports:    https://github.com/himura/beam-mysql-haskell/issues
+author:         Takahiro Himura
+maintainer:     taka@himura.jp
+copyright:      2023 Takahiro Himura
+license:        MIT
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    CHANGELOG.md
+
+source-repository head
+  type: git
+  location: https://github.com/himura/beam-mysql-haskell
+
+library
+  exposed-modules:
+      Lib
+  other-modules:
+      Paths_beam_mysql_haskell
+  hs-source-dirs:
+      src
+  default-extensions:
+      DataKinds
+      DefaultSignatures
+      DeriveAnyClass
+      DerivingStrategies
+      DerivingVia
+      DuplicateRecordFields
+      FunctionalDependencies
+      GADTs
+      LambdaCase
+      MultiWayIf
+      OverloadedLabels
+      OverloadedRecordDot
+      OverloadedStrings
+      PackageImports
+      QuasiQuotes
+      RecordWildCards
+      StrictData
+      TypeFamilies
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -Werror
+  build-depends:
+      base >=4.10 && <5
+  default-language: GHC2021
+
+test-suite beam-mysql-haskell-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_beam_mysql_haskell
+  hs-source-dirs:
+      test
+  default-extensions:
+      DataKinds
+      DefaultSignatures
+      DeriveAnyClass
+      DerivingStrategies
+      DerivingVia
+      DuplicateRecordFields
+      FunctionalDependencies
+      GADTs
+      LambdaCase
+      MultiWayIf
+      OverloadedLabels
+      OverloadedRecordDot
+      OverloadedStrings
+      PackageImports
+      QuasiQuotes
+      RecordWildCards
+      StrictData
+      TypeFamilies
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.10 && <5
+    , beam-mysql-haskell
+    , tasty
+    , tasty-hunit
+    , tasty-th
+  default-language: GHC2021
