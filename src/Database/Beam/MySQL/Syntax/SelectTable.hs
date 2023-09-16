@@ -19,6 +19,7 @@ module Database.Beam.MySQL.Syntax.SelectTable
 
 import Data.ByteString (ByteString)
 import Data.ByteString.Builder as Builder
+import Data.Coerce
 import Data.Text (Text)
 import Database.Beam.Backend.SQL
 import Database.Beam.MySQL.Syntax.Type
@@ -92,17 +93,52 @@ newtype MySQLProjectionSyntax = MySQLProjectionSyntax {fromMySQLProjection :: My
 
 instance IsSql92ProjectionSyntax MySQLProjectionSyntax where
     type Sql92ProjectionExpressionSyntax MySQLProjectionSyntax = MySQLExpressionSyntax
-    projExprs = error "Not Implemented"
+    projExprs =
+        MySQLProjectionSyntax
+            . commas
+            . map (\(expr, nm) -> fromMySQLExpression expr <> maybe mempty (\n -> emit " AS " <> quotedIdentifier n) nm)
 
 newtype MySQLFromSyntax = MySQLFromSyntax {fromMySQLFrom :: MySQLSyntax}
 
 instance IsSql92FromSyntax MySQLFromSyntax where
     type Sql92FromTableSourceSyntax MySQLFromSyntax = MySQLTableSourceSyntax
     type Sql92FromExpressionSyntax MySQLFromSyntax = MySQLExpressionSyntax
-    fromTable = error "Not Implemented"
-    innerJoin = error "Not Implemented"
-    leftJoin = error "Not Implemented"
-    rightJoin = error "Not Implemented"
+    fromTable tableSrc Nothing = coerce tableSrc
+    fromTable tableSrc (Just (name, colNames)) =
+        MySQLFromSyntax $
+            fromMySQLTableSource tableSrc
+                <> emit " AS "
+                <> quotedIdentifier name
+                <> maybe mempty (parens . commas . map quotedIdentifier) colNames
+
+    innerJoin = mysqlJoin -- In MySQL, JOIN, CROSS JOIN, and INNER JOIN are syntactic equivalents. see 13.2.13.2 JOIN Clause
+    leftJoin = mysqlLRJoin "LEFT"
+    rightJoin = mysqlLRJoin "RIGHT"
+
+mysqlJoin'
+    :: ByteString
+    -> MySQLFromSyntax
+    -> MySQLFromSyntax
+    -> MySQLSyntax
+mysqlJoin' joinType a b = fromMySQLFrom a <> spaces (emit joinType) <> fromMySQLFrom b
+
+mysqlJoin
+    :: MySQLFromSyntax
+    -> MySQLFromSyntax
+    -> Maybe MySQLExpressionSyntax
+    -> MySQLFromSyntax
+mysqlJoin a b onCondMay =
+    MySQLFromSyntax $ mysqlJoin' "JOIN" a b <> maybe mempty ((emit " ON " <>) . fromMySQLExpression) onCondMay
+
+mysqlLRJoin
+    :: ByteString
+    -- ^ join type
+    -> MySQLFromSyntax
+    -> MySQLFromSyntax
+    -> Maybe MySQLExpressionSyntax
+    -> MySQLFromSyntax
+mysqlLRJoin joinType a b onCondMay =
+    MySQLFromSyntax $ mysqlJoin' joinType a b <> emit " ON " <> maybe (emit "TRUE") fromMySQLExpression onCondMay
 
 newtype MySQLTableSourceSyntax = MySQLTableSourceSyntax {fromMySQLTableSource :: MySQLSyntax}
 
@@ -129,16 +165,13 @@ newtype MySQLGroupingSyntax = MySQLGroupingSyntax {fromMySQLGrouping :: MySQLSyn
 
 instance IsSql92GroupingSyntax MySQLGroupingSyntax where
     type Sql92GroupingExpressionSyntax MySQLGroupingSyntax = MySQLExpressionSyntax
-    groupByExpressions
-        :: [Sql92GroupingExpressionSyntax MySQLGroupingSyntax]
-        -> MySQLGroupingSyntax
-    groupByExpressions = error "Not Implemented"
+    groupByExpressions = MySQLGroupingSyntax . commas . map fromMySQLExpression
 
 newtype MySQLSelectSetQuantifierSyntax = MySQLSelectSetQuantifierSyntax {fromMySQLSelectSetQuantifier :: MySQLSyntax}
 
 instance IsSql92AggregationSetQuantifierSyntax MySQLSelectSetQuantifierSyntax where
-    setQuantifierDistinct = error "Not Implemented"
-    setQuantifierAll = error "Not Implemented"
+    setQuantifierDistinct = MySQLSelectSetQuantifierSyntax $ emit "DISTINCT"
+    setQuantifierAll = MySQLSelectSetQuantifierSyntax $ emit "ALL"
 
 newtype MySQLOrderingSyntax = MySQLOrderingSyntax {fromMySQLOrdering :: MySQLSyntax}
 
@@ -420,7 +453,5 @@ instance IsSql92ExtractFieldSyntax MySQLExtractFieldSyntax where
 newtype MySQLAggregationSetQuantifierSyntax = MySQLAggregationSetQuantifierSyntax {fromMySQLAggregationSetQuantifier :: MySQLSyntax}
 
 instance IsSql92AggregationSetQuantifierSyntax MySQLAggregationSetQuantifierSyntax where
-    setQuantifierDistinct :: MySQLAggregationSetQuantifierSyntax
-    setQuantifierDistinct = error "Not Implemented"
-    setQuantifierAll :: MySQLAggregationSetQuantifierSyntax
-    setQuantifierAll = error "Not Implemented"
+    setQuantifierDistinct = MySQLAggregationSetQuantifierSyntax $ emit "DISTINCT"
+    setQuantifierAll = MySQLAggregationSetQuantifierSyntax $ emit "ALL"
