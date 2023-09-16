@@ -7,6 +7,8 @@ module Database.Beam.MySQL.Syntax.Type
       -- * utils
     , parens
     , spaces
+    , sepBy
+    , commas
     ) where
 
 import Data.ByteString (ByteString)
@@ -63,3 +65,11 @@ parens a = emit "(" <> a <> emit ")"
 
 spaces :: MySQLSyntax -> MySQLSyntax
 spaces a = emit " " <> a <> emit " "
+
+sepBy :: MySQLSyntax -> [MySQLSyntax] -> MySQLSyntax
+sepBy _ [] = mempty
+sepBy _ [x] = x
+sepBy sep (x : xs) = x <> foldMap (sep <>) xs
+
+commas :: [MySQLSyntax] -> MySQLSyntax
+commas = sepBy (emit ",")
