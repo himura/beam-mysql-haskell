@@ -9,6 +9,7 @@ module Database.Beam.MySQL.Syntax.Type
     , spaces
     , sepBy
     , commas
+    , quotedIdentifier
     ) where
 
 import Data.ByteString (ByteString)
@@ -19,6 +20,8 @@ import Data.ByteString.Builder as Builder
     )
 import Data.ByteString.Lazy qualified as L
 import Data.DList qualified as DL
+import Data.Text qualified as T
+import Data.Text.Encoding qualified as T
 import Database.MySQL.Base (MySQLValue)
 
 data MySQLSyntax = MySQLSyntax
@@ -73,3 +76,8 @@ sepBy sep (x : xs) = x <> foldMap (sep <>) xs
 
 commas :: [MySQLSyntax] -> MySQLSyntax
 commas = sepBy (emit ",")
+
+quotedIdentifier :: T.Text -> MySQLSyntax
+quotedIdentifier name = emit $ T.encodeUtf8 $ "`" <> quoted <> "`"
+  where
+    quoted = T.replace "`" "``" name
