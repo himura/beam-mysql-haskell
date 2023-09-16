@@ -77,7 +77,13 @@ newtype MySQLProjectionSyntax = MySQLProjectionSyntax {fromMySQLProjection :: My
 newtype MySQLFromSyntax = MySQLFromSyntax {fromMySQLFrom :: MySQLSyntax}
 newtype MySQLGroupingSyntax = MySQLGroupingSyntax {fromMySQLGrouping :: MySQLSyntax}
 newtype MySQLSelectSetQuantifierSyntax = MySQLSelectSetQuantifierSyntax {fromMySQLSelectSetQuantifier :: MySQLSyntax}
+
 newtype MySQLOrderingSyntax = MySQLOrderingSyntax {fromMySQLOrdering :: MySQLSyntax}
+
+instance IsSql92OrderingSyntax MySQLOrderingSyntax where
+    type Sql92OrderingExpressionSyntax MySQLOrderingSyntax = MySQLExpressionSyntax
+    ascOrdering e = MySQLOrderingSyntax $ fromMySQLExpression e <> emit " ASC"
+    descOrdering e = MySQLOrderingSyntax $ fromMySQLExpression e <> emit " DESC"
 
 -- TODO
 data MySQLSelectForUpdateSyntax = MySQLSelectForUpdateSyntax
