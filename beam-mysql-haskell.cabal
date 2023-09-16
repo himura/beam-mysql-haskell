@@ -29,6 +29,7 @@ library
   exposed-modules:
       Database.Beam.MySQL.Syntax.SelectTable
       Database.Beam.MySQL.Syntax.Type
+      Database.Beam.MySQL.Syntax.Value
   other-modules:
       Paths_beam_mysql_haskell
   hs-source-dirs:
