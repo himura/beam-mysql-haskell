@@ -28,6 +28,7 @@ dependencies:
 - memory >=0.14.4 && <0.19
 - monad-loops >=0.4 && <0.5
 - mysql-haskell >= 1.0
+- dlist
 - network >=2.3 && <4.0
 - pem >=0.2.4 && <0.3
 - scientific >=0.3 && <0.4
