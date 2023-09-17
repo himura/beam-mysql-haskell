@@ -196,184 +196,80 @@ instance IsSql92ExpressionSyntax MySQLExpressionSyntax where
     type Sql92ExpressionCastTargetSyntax MySQLExpressionSyntax = MySQLDataTypeSyntax
     type Sql92ExpressionExtractFieldSyntax MySQLExpressionSyntax = MySQLExtractFieldSyntax
 
-    valueE
-        :: Sql92ExpressionValueSyntax MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-    valueE = error "Not Implemented"
-    rowE :: [MySQLExpressionSyntax] -> MySQLExpressionSyntax
-    rowE = error "Not Implemented"
-    coalesceE :: [MySQLExpressionSyntax] -> MySQLExpressionSyntax
-    coalesceE = error "Not Implemented"
-    caseE
-        :: [(MySQLExpressionSyntax, MySQLExpressionSyntax)]
-        -> MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-    caseE = error "Not Implemented"
-    fieldE
-        :: Sql92ExpressionFieldNameSyntax MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-    fieldE = error "Not Implemented"
-    andE
-        :: MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-    andE = error "Not Implemented"
-    orE
-        :: MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-    orE = error "Not Implemented"
-    addE
-        :: MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-    addE = error "Not Implemented"
-    subE
-        :: MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-    subE = error "Not Implemented"
-    mulE
-        :: MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-    mulE = error "Not Implemented"
-    divE
-        :: MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-    divE = error "Not Implemented"
-    likeE
-        :: MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-    likeE = error "Not Implemented"
-    modE
-        :: MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-    modE = error "Not Implemented"
-    overlapsE
-        :: MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-    overlapsE = error "Not Implemented"
-    nullIfE
-        :: MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-    nullIfE = error "Not Implemented"
-    positionE
-        :: MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-    positionE = error "Not Implemented"
-    eqE
-        :: Maybe (Sql92ExpressionQuantifierSyntax MySQLExpressionSyntax)
-        -> MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-    eqE = error "Not Implemented"
-    neqE
-        :: Maybe (Sql92ExpressionQuantifierSyntax MySQLExpressionSyntax)
-        -> MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-    neqE = error "Not Implemented"
-    ltE
-        :: Maybe (Sql92ExpressionQuantifierSyntax MySQLExpressionSyntax)
-        -> MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-    ltE = error "Not Implemented"
-    gtE
-        :: Maybe (Sql92ExpressionQuantifierSyntax MySQLExpressionSyntax)
-        -> MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-    gtE = error "Not Implemented"
-    leE
-        :: Maybe (Sql92ExpressionQuantifierSyntax MySQLExpressionSyntax)
-        -> MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-    leE = error "Not Implemented"
-    geE
-        :: Maybe (Sql92ExpressionQuantifierSyntax MySQLExpressionSyntax)
-        -> MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-    geE = error "Not Implemented"
-    castE
-        :: MySQLExpressionSyntax
-        -> Sql92ExpressionCastTargetSyntax MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-    castE = error "Not Implemented"
-    notE :: MySQLExpressionSyntax -> MySQLExpressionSyntax
-    notE = error "Not Implemented"
-    negateE :: MySQLExpressionSyntax -> MySQLExpressionSyntax
-    negateE = error "Not Implemented"
-    isNullE :: MySQLExpressionSyntax -> MySQLExpressionSyntax
-    isNullE = error "Not Implemented"
-    isNotNullE :: MySQLExpressionSyntax -> MySQLExpressionSyntax
-    isNotNullE = error "Not Implemented"
-    isTrueE :: MySQLExpressionSyntax -> MySQLExpressionSyntax
-    isTrueE = error "Not Implemented"
-    isNotTrueE :: MySQLExpressionSyntax -> MySQLExpressionSyntax
-    isNotTrueE = error "Not Implemented"
-    isFalseE :: MySQLExpressionSyntax -> MySQLExpressionSyntax
-    isFalseE = error "Not Implemented"
-    isNotFalseE :: MySQLExpressionSyntax -> MySQLExpressionSyntax
-    isNotFalseE = error "Not Implemented"
-    isUnknownE :: MySQLExpressionSyntax -> MySQLExpressionSyntax
-    isUnknownE = error "Not Implemented"
-    isNotUnknownE :: MySQLExpressionSyntax -> MySQLExpressionSyntax
-    isNotUnknownE = error "Not Implemented"
-    charLengthE :: MySQLExpressionSyntax -> MySQLExpressionSyntax
-    charLengthE = error "Not Implemented"
-    octetLengthE :: MySQLExpressionSyntax -> MySQLExpressionSyntax
-    octetLengthE = error "Not Implemented"
-    bitLengthE :: MySQLExpressionSyntax -> MySQLExpressionSyntax
-    bitLengthE = error "Not Implemented"
-    lowerE :: MySQLExpressionSyntax -> MySQLExpressionSyntax
-    lowerE = error "Not Implemented"
-    upperE :: MySQLExpressionSyntax -> MySQLExpressionSyntax
-    upperE = error "Not Implemented"
-    trimE :: MySQLExpressionSyntax -> MySQLExpressionSyntax
-    trimE = error "Not Implemented"
-    absE :: MySQLExpressionSyntax -> MySQLExpressionSyntax
-    absE = error "Not Implemented"
-    extractE
-        :: Sql92ExpressionExtractFieldSyntax MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-    extractE = error "Not Implemented"
-    existsE
-        :: Sql92ExpressionSelectSyntax MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-    existsE = error "Not Implemented"
-    uniqueE
-        :: Sql92ExpressionSelectSyntax MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-    uniqueE = error "Not Implemented"
-    subqueryE
-        :: Sql92ExpressionSelectSyntax MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-    subqueryE = error "Not Implemented"
-    currentTimestampE :: MySQLExpressionSyntax
-    currentTimestampE = error "Not Implemented"
-    defaultE :: MySQLExpressionSyntax
-    defaultE = error "Not Implemented"
-    inE
-        :: MySQLExpressionSyntax
-        -> [MySQLExpressionSyntax]
-        -> MySQLExpressionSyntax
-    inE = error "Not Implemented"
-    inSelectE
-        :: MySQLExpressionSyntax
-        -> Sql92ExpressionSelectSyntax MySQLExpressionSyntax
-        -> MySQLExpressionSyntax
-    inSelectE = error "Not Implemented"
+    valueE = coerce
+    rowE = MySQLExpressionSyntax . parens . commas . map fromMySQLExpression
+    coalesceE = MySQLExpressionSyntax . (emit "COALESCE" <>) . parens . commas . map fromMySQLExpression
+    caseE cases else_ =
+        MySQLExpressionSyntax $
+            emit "CASE"
+                <> foldMap (\(cond, res) -> emit " WHEN " <> fromMySQLExpression cond <> emit " THEN " <> fromMySQLExpression res) cases
+                <> emit " ELSE "
+                <> fromMySQLExpression else_
+                <> emit " END"
+    fieldE = coerce
+    andE = binOp "AND"
+    orE = binOp "OR"
+    addE = binOp "+"
+    subE = binOp "-"
+    mulE = binOp "*"
+    divE = binOp "/"
+    likeE = binOp "LIKE"
+    modE = binOp "%"
+    overlapsE = binOp "OVERLAPS" -- may not support?
+    nullIfE a b = MySQLExpressionSyntax $ emit "NULLIF" <> parens (commas $ map fromMySQLExpression [a, b])
+    positionE needle haystack = MySQLExpressionSyntax $ emit "POSITION" <> parens (parens (fromMySQLExpression needle) <> emit " IN " <> parens (fromMySQLExpression haystack))
+    eqE = compOp "="
+    neqE = compOp "<>"
+    ltE = compOp "<"
+    gtE = compOp ">"
+    leE = compOp "<="
+    geE = compOp ">="
+    castE expr t = MySQLExpressionSyntax $ emit "CAST" <> parens (parens (fromMySQLExpression expr) <> emit " AS " <> fromMySQLDataType t)
+    notE = unOp "NOT"
+    negateE = unOp "-"
+    isNullE = postFix "IS NULL"
+    isNotNullE = postFix "IS NOT NULL"
+    isTrueE = postFix "IS TRUE"
+    isNotTrueE = postFix "IS NOT TRUE"
+    isFalseE = postFix "IS FALSE"
+    isNotFalseE = postFix "IS NOT FALSE"
+    isUnknownE = postFix "IS UNKNOWN"
+    isNotUnknownE = postFix "IS NOT UNKNOWN"
+    charLengthE = funExpr "CHAR_LENGTH"
+    octetLengthE = funExpr "OCTET_LENGTH" -- synonym of LENGTH
+    bitLengthE = funExpr "BIT_LENGTH"
+    lowerE = funExpr "LOWER"
+    upperE = funExpr "UPPER"
+    trimE = funExpr "TRIM"
+    absE = funExpr "ABS"
+    extractE field from = MySQLExpressionSyntax $ emit "EXTRACT" <> parens (fromMySQLExtractField field <> emit " FROM " <> parens (fromMySQLExpression from))
+    existsE select = MySQLExpressionSyntax $ emit "EXISTS " <> parens (fromMySQLSelect select)
+    uniqueE select = MySQLExpressionSyntax $ emit "UNIQUE " <> parens (fromMySQLSelect select)
+    subqueryE = MySQLExpressionSyntax . parens . fromMySQLSelect
+    currentTimestampE = MySQLExpressionSyntax $ emit "CURRENT_TIMESTAMP"
+    defaultE = MySQLExpressionSyntax $ emit "DEFAULT"
+    inE e es = MySQLExpressionSyntax $ parens (fromMySQLExpression e) <> emit " IN " <> parens (commas (map fromMySQLExpression es))
+    inSelectE e select = MySQLExpressionSyntax $ parens (fromMySQLExpression e) <> emit " IN " <> parens (fromMySQLSelect select)
+
+binOp :: ByteString -> MySQLExpressionSyntax -> MySQLExpressionSyntax -> MySQLExpressionSyntax
+binOp op a b = MySQLExpressionSyntax $ parens (fromMySQLExpression a) <> spaces (emit op) <> parens (fromMySQLExpression b)
+
+postFix :: ByteString -> MySQLExpressionSyntax -> MySQLExpressionSyntax
+postFix op a = MySQLExpressionSyntax $ parens (fromMySQLExpression a) <> emit " " <> emit op
+
+unOp :: ByteString -> MySQLExpressionSyntax -> MySQLExpressionSyntax
+unOp op a = MySQLExpressionSyntax $ emit op <> parens (fromMySQLExpression a)
+
+compOp :: ByteString -> Maybe MySQLQuantifierSyntax -> MySQLExpressionSyntax -> MySQLExpressionSyntax -> MySQLExpressionSyntax
+compOp op quantifier a b =
+    MySQLExpressionSyntax $
+        parens (fromMySQLExpression a)
+            <> spaces (emit op)
+            <> maybe mempty ((<> emit " ") . fromMySQLQuantifier) quantifier
+            <> parens (fromMySQLExpression b)
+
+funExpr :: ByteString -> MySQLExpressionSyntax -> MySQLExpressionSyntax
+funExpr f a = MySQLExpressionSyntax $ emit f <> parens (fromMySQLExpression a)
 
 instance IsSql92AggregationExpressionSyntax MySQLExpressionSyntax where
     type Sql92AggregationSetQuantifierSyntax MySQLExpressionSyntax = MySQLAggregationSetQuantifierSyntax
