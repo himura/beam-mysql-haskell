@@ -12,10 +12,10 @@ module Database.Beam.MySQL.Syntax.SelectTable
     ) where
 
 import Data.ByteString (ByteString)
-import Data.ByteString.Builder as Builder
-import Data.Coerce
+import Data.ByteString.Builder qualified as Builder
+import Data.Coerce (coerce)
 import Database.Beam.Backend.SQL
-import Database.Beam.MySQL.Syntax.Expression
+import Database.Beam.MySQL.Syntax.Expression (MySQLExpressionSyntax (..))
 import Database.Beam.MySQL.Syntax.Type
 
 newtype MySQLSelectTableSyntax = MySQLSelectTableSyntax {fromMySQLSelectTable :: MySQLSyntax} deriving (Eq, Show)
@@ -76,7 +76,7 @@ mysqlSelectStmt forUpdate tbl ordering limit offset =
             <> intClause " OFFSET " offset
             <> maybe mempty fromMySQLSelectForUpdate forUpdate
   where
-    intClause prefix = maybe mempty (emitBuilder . (byteString prefix <>) . Builder.string8 . show)
+    intClause prefix = maybe mempty (emitBuilder . (Builder.byteString prefix <>) . Builder.string8 . show)
 
     ssOrdering = case ordering of
         [] -> mempty

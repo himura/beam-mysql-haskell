@@ -9,14 +9,14 @@ module Database.Beam.MySQL.Syntax.Expression
 where
 
 import Data.ByteString (ByteString)
-import Data.ByteString.Builder as Builder
-import Data.Coerce
+import Data.ByteString.Builder qualified as Builder
+import Data.Coerce (coerce)
 import Data.Text (Text)
 import Data.Text.Encoding qualified as T
 import Database.Beam.Backend.SQL
-import {-# SOURCE #-} Database.Beam.MySQL.Syntax.SelectTable
+import {-# SOURCE #-} Database.Beam.MySQL.Syntax.SelectTable (MySQLSelectSyntax (..))
 import Database.Beam.MySQL.Syntax.Type
-import Database.Beam.MySQL.Syntax.Value
+import Database.Beam.MySQL.Syntax.Value (MySQLValueSyntax (..))
 
 newtype MySQLExpressionSyntax = MySQLExpressionSyntax {fromMySQLExpression :: MySQLSyntax} deriving (Eq)
 

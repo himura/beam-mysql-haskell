@@ -13,11 +13,8 @@ module Database.Beam.MySQL.Syntax.Type
     ) where
 
 import Data.ByteString (ByteString)
-import Data.ByteString.Builder as Builder
-    ( Builder
-    , byteString
-    , toLazyByteString
-    )
+import Data.ByteString.Builder (Builder)
+import Data.ByteString.Builder qualified as Builder
 import Data.ByteString.Lazy qualified as L
 import Data.DList qualified as DL
 import Data.Text qualified as T
@@ -55,7 +52,7 @@ buildSqlWithPlaceholder :: SqlBuilder -> L.ByteString
 buildSqlWithPlaceholder (SqlBuilder builder) = Builder.toLazyByteString $ builder (const "?")
 
 emit :: ByteString -> MySQLSyntax
-emit = emitBuilder . byteString
+emit = emitBuilder . Builder.byteString
 
 emitBuilder :: Builder -> MySQLSyntax
 emitBuilder builder = MySQLSyntax (SqlBuilder $ const builder) mempty
