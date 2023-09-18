@@ -21,6 +21,7 @@ import Data.ByteString (ByteString)
 import Data.ByteString.Builder as Builder
 import Data.Coerce
 import Data.Text (Text)
+import Data.Text.Encoding qualified as T
 import Database.Beam.Backend.SQL
 import Database.Beam.MySQL.Syntax.Type
 import Database.Beam.MySQL.Syntax.Value
@@ -273,12 +274,19 @@ funExpr f a = MySQLExpressionSyntax $ emit f <> parens (fromMySQLExpression a)
 
 instance IsSql92AggregationExpressionSyntax MySQLExpressionSyntax where
     type Sql92AggregationSetQuantifierSyntax MySQLExpressionSyntax = MySQLAggregationSetQuantifierSyntax
-    countAllE = error "Not Implemented"
-    countE = error "Not Implemented"
-    avgE = error "Not Implemented"
-    maxE = error "Not Implemented"
-    minE = error "Not Implemented"
-    sumE = error "Not Implemented"
+    countAllE = MySQLExpressionSyntax $ emit "COUNT(*)"
+    countE = unAgg "COUNT"
+    avgE = unAgg "AVG"
+    maxE = unAgg "MAX"
+    minE = unAgg "MIN"
+    sumE = unAgg "SUM"
+
+unAgg :: ByteString -> Maybe MySQLAggregationSetQuantifierSyntax -> MySQLExpressionSyntax -> MySQLExpressionSyntax
+unAgg fn quantifier expr =
+    MySQLExpressionSyntax $
+        emit fn
+            <> parens (maybe mempty (\q -> fromMySQLAggregationSetQuantifier q <> emit " ") quantifier)
+            <> fromMySQLExpression expr
 
 newtype MySQLQuantifierSyntax = MySQLQuantifierSyntax {fromMySQLQuantifier :: MySQLSyntax}
 
@@ -292,43 +300,44 @@ instance IsSql92FieldNameSyntax MySQLFieldNameSyntax where
     qualifiedField tbl col = MySQLFieldNameSyntax $ quotedIdentifier tbl <> emit "." <> quotedIdentifier col
     unqualifiedField col = MySQLFieldNameSyntax $ quotedIdentifier col
 
+-- TODO: support migration
 newtype MySQLDataTypeSyntax = MySQLDataTypeSyntax {fromMySQLDataType :: MySQLSyntax}
 
 instance IsSql92DataTypeSyntax MySQLDataTypeSyntax where
-    domainType :: Text -> MySQLDataTypeSyntax
-    domainType = error "Not Implemented"
-    charType :: Maybe Word -> Maybe Text -> MySQLDataTypeSyntax
-    charType = error "Not Implemented"
-    varCharType :: Maybe Word -> Maybe Text -> MySQLDataTypeSyntax
-    varCharType = error "Not Implemented"
-    nationalCharType :: Maybe Word -> MySQLDataTypeSyntax
-    nationalCharType = error "Not Implemented"
-    nationalVarCharType :: Maybe Word -> MySQLDataTypeSyntax
-    nationalVarCharType = error "Not Implemented"
-    bitType :: Maybe Word -> MySQLDataTypeSyntax
-    bitType = error "Not Implemented"
-    varBitType :: Maybe Word -> MySQLDataTypeSyntax
-    varBitType = error "Not Implemented"
-    numericType :: Maybe (Word, Maybe Word) -> MySQLDataTypeSyntax
-    numericType = error "Not Implemented"
-    decimalType :: Maybe (Word, Maybe Word) -> MySQLDataTypeSyntax
-    decimalType = error "Not Implemented"
-    intType :: MySQLDataTypeSyntax
-    intType = error "Not Implemented"
-    smallIntType :: MySQLDataTypeSyntax
-    smallIntType = error "Not Implemented"
-    floatType :: Maybe Word -> MySQLDataTypeSyntax
-    floatType = error "Not Implemented"
-    doubleType :: MySQLDataTypeSyntax
-    doubleType = error "Not Implemented"
-    realType :: MySQLDataTypeSyntax
-    realType = error "Not Implemented"
-    dateType :: MySQLDataTypeSyntax
-    dateType = error "Not Implemented"
-    timeType :: Maybe Word -> Bool -> MySQLDataTypeSyntax
-    timeType = error "Not Implemented"
-    timestampType :: Maybe Word -> Bool -> MySQLDataTypeSyntax
-    timestampType = error "Not Implemented"
+    domainType = MySQLDataTypeSyntax . quotedIdentifier
+    charType prec charSet = MySQLDataTypeSyntax $ emit "CHAR" <> mysqlOptPrec prec <> mysqlCharSet charSet
+    varCharType prec charSet = MySQLDataTypeSyntax $ emit "VARCHAR" <> mysqlOptPrec prec <> mysqlCharSet charSet
+    nationalCharType prec = mysqlType "NATIONAL CHAR" prec
+    nationalVarCharType prec = mysqlType "NATIONAL VARCHAR" prec
+    bitType prec = mysqlType "BIT" prec
+    varBitType prec = mysqlType "BIT" prec -- BIT VARYING is not supported
+    numericType prec = MySQLDataTypeSyntax $ emit "NUMERIC" <> mysqlOptNumericPrec prec -- same as decimal
+    decimalType prec = MySQLDataTypeSyntax $ emit "DECIMAL" <> mysqlOptNumericPrec prec
+    intType = mysqlType "INT" Nothing
+    smallIntType = mysqlType "SMALLINT" Nothing
+    floatType = mysqlType "FLOAT"
+    doubleType = mysqlType "DOUBLE" Nothing -- can take precision
+    realType = mysqlType "REAL" Nothing -- can take precision
+    dateType = mysqlType "DATE" Nothing
+    timeType prec _tz = mysqlType "TIME" prec -- mysql TIME is timezone agnostic
+    timestampType prec _tz = mysqlType "TIMESTAMP" prec -- mysql TIMESTAMP is timezone agnostic
+
+mysqlType :: ByteString -> Maybe Word -> MySQLDataTypeSyntax
+mysqlType tname prec =
+    MySQLDataTypeSyntax $ emit tname <> mysqlOptPrec prec
+
+mysqlOptPrec :: Maybe Word -> MySQLSyntax
+mysqlOptPrec Nothing = mempty
+mysqlOptPrec (Just prec) = parens $ emitBuilder (Builder.string7 (show prec))
+
+mysqlOptNumericPrec :: Maybe (Word, Maybe Word) -> MySQLSyntax
+mysqlOptNumericPrec Nothing = mempty
+mysqlOptNumericPrec (Just (prec, Nothing)) = mysqlOptPrec $ Just prec
+mysqlOptNumericPrec (Just (prec, Just dec)) = parens $ emitBuilder (Builder.string7 (show prec)) <> emit "," <> emitBuilder (Builder.string7 (show dec))
+
+mysqlCharSet :: Maybe Text -> MySQLSyntax
+mysqlCharSet Nothing = mempty
+mysqlCharSet (Just cs) = emit " CHARACTER SET " <> emit (T.encodeUtf8 cs)
 
 newtype MySQLExtractFieldSyntax = MySQLExtractFieldSyntax {fromMySQLExtractField :: MySQLSyntax}
 
