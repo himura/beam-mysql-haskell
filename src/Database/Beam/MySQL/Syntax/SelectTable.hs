@@ -342,18 +342,12 @@ mysqlCharSet (Just cs) = emit " CHARACTER SET " <> emit (T.encodeUtf8 cs)
 newtype MySQLExtractFieldSyntax = MySQLExtractFieldSyntax {fromMySQLExtractField :: MySQLSyntax}
 
 instance IsSql92ExtractFieldSyntax MySQLExtractFieldSyntax where
-    secondsField :: MySQLExtractFieldSyntax
-    secondsField = error "Not Implemented"
-    minutesField :: MySQLExtractFieldSyntax
-    minutesField = error "Not Implemented"
-    hourField :: MySQLExtractFieldSyntax
-    hourField = error "Not Implemented"
-    dayField :: MySQLExtractFieldSyntax
-    dayField = error "Not Implemented"
-    monthField :: MySQLExtractFieldSyntax
-    monthField = error "Not Implemented"
-    yearField :: MySQLExtractFieldSyntax
-    yearField = error "Not Implemented"
+    secondsField = MySQLExtractFieldSyntax $ emit "SECOND"
+    minutesField = MySQLExtractFieldSyntax $ emit "MINUTE"
+    hourField = MySQLExtractFieldSyntax $ emit "HOUR"
+    dayField = MySQLExtractFieldSyntax $ emit "DAY"
+    monthField = MySQLExtractFieldSyntax $ emit "MONTH"
+    yearField = MySQLExtractFieldSyntax $ emit "YEAR"
 
 newtype MySQLAggregationSetQuantifierSyntax = MySQLAggregationSetQuantifierSyntax {fromMySQLAggregationSetQuantifier :: MySQLSyntax}
 
