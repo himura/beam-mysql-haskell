@@ -33,6 +33,7 @@ library
       Database.Beam.MySQL.Syntax.SelectTable
       Database.Beam.MySQL.Syntax.TableName
       Database.Beam.MySQL.Syntax.Type
+      Database.Beam.MySQL.Syntax.Update
       Database.Beam.MySQL.Syntax.Value
   other-modules:
       Paths_beam_mysql_haskell
