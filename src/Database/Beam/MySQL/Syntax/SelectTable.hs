@@ -4,7 +4,6 @@ module Database.Beam.MySQL.Syntax.SelectTable
     , MySQLProjectionSyntax (..)
     , MySQLFromSyntax (..)
     , MySQLTableSourceSyntax (..)
-    , MySQLTableNameSyntax (..)
     , MySQLGroupingSyntax (..)
     , MySQLSelectSetQuantifierSyntax (..)
     , MySQLOrderingSyntax (..)
@@ -16,6 +15,7 @@ import Data.ByteString.Builder qualified as Builder
 import Data.Coerce (coerce)
 import Database.Beam.Backend.SQL
 import Database.Beam.MySQL.Syntax.Expression (MySQLExpressionSyntax (..))
+import Database.Beam.MySQL.Syntax.TableName
 import Database.Beam.MySQL.Syntax.Type
 
 newtype MySQLSelectTableSyntax = MySQLSelectTableSyntax {fromMySQLSelectTable :: MySQLSyntax} deriving (Eq, Show)
@@ -147,12 +147,6 @@ instance IsSql92TableSourceSyntax MySQLTableSourceSyntax where
             . parens
             $ emit "VALUES "
                 <> commas (map (parens . commas . map fromMySQLExpression) vss)
-
-newtype MySQLTableNameSyntax = MySQLTableNameSyntax {fromMySQLTableName :: MySQLSyntax}
-
-instance IsSql92TableNameSyntax MySQLTableNameSyntax where
-    tableName Nothing t = MySQLTableNameSyntax $ quotedIdentifier t
-    tableName (Just db) t = MySQLTableNameSyntax $ quotedIdentifier db <> emit "." <> quotedIdentifier t
 
 newtype MySQLGroupingSyntax = MySQLGroupingSyntax {fromMySQLGrouping :: MySQLSyntax}
 

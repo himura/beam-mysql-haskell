@@ -1,5 +1,8 @@
 module Database.Beam.MySQL.Syntax.Type
     ( MySQLSyntax (..)
+    , buildSqlWithPlaceholder
+
+      -- * emit
     , emit
     , emitBuilder
     , emitValue

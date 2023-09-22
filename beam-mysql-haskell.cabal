@@ -29,6 +29,7 @@ library
   exposed-modules:
       Database.Beam.MySQL.Syntax.Expression
       Database.Beam.MySQL.Syntax.SelectTable
+      Database.Beam.MySQL.Syntax.TableName
       Database.Beam.MySQL.Syntax.Type
       Database.Beam.MySQL.Syntax.Value
   other-modules:
