@@ -27,6 +27,7 @@ source-repository head
 
 library
   exposed-modules:
+      Database.Beam.MySQL.Syntax.Delete
       Database.Beam.MySQL.Syntax.Expression
       Database.Beam.MySQL.Syntax.SelectTable
       Database.Beam.MySQL.Syntax.TableName
