@@ -105,8 +105,8 @@ instance IsSql92FromSyntax MySQLFromSyntax where
                 <> maybe mempty (parens . commas . map quotedIdentifier) colNames
 
     innerJoin = mysqlJoin -- In MySQL, JOIN, CROSS JOIN, and INNER JOIN are syntactic equivalents. see 13.2.13.2 JOIN Clause
-    leftJoin = mysqlLRJoin "LEFT"
-    rightJoin = mysqlLRJoin "RIGHT"
+    leftJoin = mysqlLRJoin "LEFT JOIN"
+    rightJoin = mysqlLRJoin "RIGHT JOIN"
 
 mysqlJoin'
     :: ByteString
