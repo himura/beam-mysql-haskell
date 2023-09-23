@@ -28,6 +28,7 @@ source-repository head
 library
   exposed-modules:
       Database.Beam.MySQL.Connection
+      Database.Beam.MySQL.FromField
       Database.Beam.MySQL.Syntax
       Database.Beam.MySQL.Syntax.Delete
       Database.Beam.MySQL.Syntax.Expression
