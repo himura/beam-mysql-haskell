@@ -27,6 +27,7 @@ source-repository head
 
 library
   exposed-modules:
+      Database.Beam.MySQL.Backend
       Database.Beam.MySQL.Connection
       Database.Beam.MySQL.FromField
       Database.Beam.MySQL.Syntax

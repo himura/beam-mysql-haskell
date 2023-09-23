@@ -8,22 +8,42 @@ module Database.Beam.MySQL.Connection
     , runBeamMySQLM
     ) where
 
-import Control.Monad.Free.Church
-import Control.Monad.IO.Unlift
-import Control.Monad.Reader
+import Control.Monad.Free.Church (F (runF))
+import Control.Monad.IO.Unlift (MonadIO (..), MonadUnliftIO)
+import Control.Monad.Reader (MonadReader (ask), ReaderT (..), void)
+import Data.ByteString.Lazy qualified as L
 import Data.DList qualified as DList
 import Data.Text (Text)
 import Data.Text qualified as T
+import Data.Text.Encoding qualified as T
+import Data.Typeable (tyConName)
 import Database.Beam
+    ( FromBackendRow (fromBackendRow)
+    , MonadBeam (runNoReturn, runReturningMany)
+    )
 import Database.Beam.Backend
+    ( BeamRowReadError (BeamRowReadError)
+    , ColumnParseError (..)
+    , FromBackendRowF (..)
+    , FromBackendRowM (..)
+    )
+import Database.Beam.MySQL.Backend (MySQL (..))
+import Database.Beam.MySQL.FromField
+    ( DecodeError (DecodeError)
+    , DecodeErrorDetail (DecodeErrorUnexpectedNull)
+    , FromField (fromField)
+    )
 import Database.Beam.MySQL.Syntax
+    ( MySQLCommandSyntax (MySQLCommandQuery)
+    )
 import Database.Beam.MySQL.Syntax.Type
+    ( MySQLSyntax (MySQLSyntax)
+    , buildSqlWithPlaceholder
+    )
 import Database.MySQL.Base (MySQLConn, MySQLValue)
 import Database.MySQL.Base qualified as MySQL
 import System.IO.Streams qualified as Streams
-import UnliftIO.Exception
-
-data MySQL = MySQL
+import UnliftIO.Exception (bracket, throwIO)
 
 data MySQLEnv = MySQLEnv
     { connection :: MySQLConn
@@ -51,35 +71,31 @@ runBeamMySQLM
     -> IO a
 runBeamMySQLM = runBeamMySQLMWithDebug (const (return ()))
 
-class FromBackendField a where
-    fromBackendField :: MySQLValue -> Either Text a
-
-instance BeamBackend MySQL where
-    type BackendFromField MySQL = FromBackendField
-
-type instance BeamSqlBackendSyntax MySQL = MySQLCommandSyntax
-
 instance (MonadUnliftIO m, MonadReader MySQLEnv m) => MonadBeam MySQL m where
     runReturningMany (MySQLCommandQuery (MySQLSyntax cmd paramsDL)) action = do
         env <- ask
-        let query = MySQL.Query $ buildSqlWithPlaceholder cmd
+        let query = buildSqlWithPlaceholder cmd
             params = DList.toList paramsDL
+        liftIO $ env.logger $ "Query: " <> T.decodeUtf8 (L.toStrict query) <> "\n    Params: " <> T.pack (show params)
         bracket
-            (liftIO $ MySQL.prepareStmtDetail env.connection query)
+            (liftIO $ MySQL.prepareStmtDetail env.connection $ MySQL.Query query)
             (\(ok, _, _) -> liftIO $ MySQL.closeStmt env.connection $ MySQL.stmtId ok)
-            $ \(MySQL.StmtPrepareOK{stmtId}, _pcols, _rcols) ->
+            $ \(ok@MySQL.StmtPrepareOK{stmtId}, pcols, rcols) -> do
+                liftIO $ env.logger $ "Prepare: OK=" <> T.pack (show ok) <> ", param columns=" <> T.pack (show pcols) <> ", result columns=" <> T.pack (show rcols)
                 bracket
                     (liftIO $ MySQL.queryStmt env.connection stmtId params)
                     (\(_, istream) -> liftIO $ consume_ istream)
                     $ \(colDefs, istream) -> action (liftIO $ readRow colDefs istream)
     runNoReturn (MySQLCommandQuery (MySQLSyntax cmd paramsDL)) = do
         env <- ask
-        let query = MySQL.Query $ buildSqlWithPlaceholder cmd
+        let query = buildSqlWithPlaceholder cmd
             params = DList.toList paramsDL
+        liftIO $ env.logger $ "Query: " <> T.decodeUtf8 (L.toStrict query) <> "\n    Params: " <> T.pack (show params)
         bracket
-            (liftIO $ MySQL.prepareStmtDetail env.connection query)
+            (liftIO $ MySQL.prepareStmtDetail env.connection $ MySQL.Query query)
             (\(ok, _, _) -> liftIO $ MySQL.closeStmt env.connection $ MySQL.stmtId ok)
-            $ \(MySQL.StmtPrepareOK{stmtId}, _pcols, _rcols) -> do
+            $ \(ok@MySQL.StmtPrepareOK{stmtId}, pcols, rcols) -> do
+                liftIO $ env.logger $ "Prepare: OK=" <> T.pack (show ok) <> ", param columns=" <> T.pack (show pcols) <> ", result columns=" <> T.pack (show rcols)
                 liftIO . void $ MySQL.executeStmt env.connection stmtId params
 
 readRow :: (FromBackendRow MySQL a) => [MySQL.ColumnDef] -> Streams.InputStream [MySQLValue] -> IO (Maybe a)
@@ -103,7 +119,6 @@ fromRow (FromBackendRowM fromBackendRowF) =
     runF fromBackendRowF finish step 0
   where
     finish a _ _ _ = Right a
-    -- finish _ _ xs = Left $ BeamRowReadError Nothing {- TODO -} $ ColumnErrorInternal ?
 
     step
         :: forall x
@@ -115,8 +130,9 @@ fromRow (FromBackendRowM fromBackendRowF) =
     step (ParseOneField _) curIdx [] _ = Left $ BeamRowReadError (Just curIdx) $ ColumnNotEnoughColumns curIdx
     step (ParseOneField _) curIdx _ [] = Left $ BeamRowReadError (Just curIdx) $ ColumnNotEnoughColumns curIdx
     step (ParseOneField next) curIdx (cdef : cdefs) (v : vs) =
-        case fromBackendField v of
-            Left err -> Left $ BeamRowReadError (Just curIdx) $ ColumnTypeMismatch "" (show $ MySQL.columnType cdef) $ T.unpack $ "failed to convert " <> err
+        case fromField v of
+            Left (DecodeError _tyCon DecodeErrorUnexpectedNull) -> Left $ BeamRowReadError (Just curIdx) ColumnUnexpectedNull
+            Left (DecodeError tyCon err) -> Left $ BeamRowReadError (Just curIdx) $ ColumnTypeMismatch (tyConName tyCon) (show $ MySQL.columnType cdef) $ "Failed to convert " ++ show err
             Right pv ->
                 next pv (curIdx + 1) cdefs vs
     step (FailParseWith err) _ _ _ = Left err
