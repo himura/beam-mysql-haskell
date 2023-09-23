@@ -22,4 +22,4 @@ instance IsSql92UpdateSyntax MySQLUpdateSyntax where
                 <> maybe mempty (\where_ -> emit " WHERE " <> fromMySQLExpression where_) whereMaybe
       where
         renderFields [] = mempty
-        renderFields fs = commas $ map (\(field, val) -> fromMySQLFieldName field <> emit " = " <> fromMySQLExpression val) fs
+        renderFields fs = emit " SET " <> commas (map (\(field, val) -> fromMySQLFieldName field <> emit " = " <> fromMySQLExpression val) fs)
