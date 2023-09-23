@@ -11,6 +11,7 @@ import Data.ByteString.Lazy qualified as L
 import Data.Int (Int16, Int32, Int64, Int8)
 import Data.Scientific (Scientific)
 import Data.Text (Text)
+import Data.Text qualified as T
 import Data.Text.Lazy qualified as TL
 import Data.Time (Day, LocalTime (LocalTime), TimeOfDay, midnight)
 import Data.Word (Word16, Word32, Word64, Word8)
@@ -141,6 +142,11 @@ instance FromField Text where
 instance FromField TL.Text where
     fromField = \case
         MySQLText v -> pure . TL.fromStrict $ v
+        unexpected -> handleUnexpected unexpected
+
+instance FromField String where
+    fromField = \case
+        MySQLText v -> pure . T.unpack $ v
         unexpected -> handleUnexpected unexpected
 
 instance FromField LocalTime where

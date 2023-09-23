@@ -73,6 +73,7 @@ instance FromBackendRow MySQL ByteString
 instance FromBackendRow MySQL L.ByteString
 instance FromBackendRow MySQL Text
 instance FromBackendRow MySQL TL.Text
+instance FromBackendRow MySQL String
 instance FromBackendRow MySQL LocalTime
 instance FromBackendRow MySQL Day
 instance FromBackendRow MySQL TimeOfDay
@@ -99,6 +100,8 @@ MYSQL_HAS_EQUALITY_CHECK (Double)
 MYSQL_HAS_EQUALITY_CHECK (ByteString)
 MYSQL_HAS_EQUALITY_CHECK (L.ByteString)
 MYSQL_HAS_EQUALITY_CHECK (Text)
+MYSQL_HAS_EQUALITY_CHECK (TL.Text)
+MYSQL_HAS_EQUALITY_CHECK (String)
 MYSQL_HAS_EQUALITY_CHECK (LocalTime)
 MYSQL_HAS_EQUALITY_CHECK (Day)
 MYSQL_HAS_EQUALITY_CHECK (TimeOfDay)

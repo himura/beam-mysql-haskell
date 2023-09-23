@@ -4,6 +4,8 @@ module Database.Beam.MySQL.Syntax.Value
     ( MySQLValueSyntax (..)
     ) where
 
+import Data.ByteString (ByteString)
+import Data.ByteString.Lazy qualified as L
 import Data.Int
 import Data.Scientific
 import Data.Text qualified as T
@@ -59,6 +61,11 @@ instance HasSqlValueSyntax MySQLValueSyntax TL.Text where
     sqlValueSyntax = sqlValueSyntax . TL.toStrict
 instance HasSqlValueSyntax MySQLValueSyntax String where
     sqlValueSyntax = sqlValueSyntax . T.pack
+
+instance HasSqlValueSyntax MySQLValueSyntax ByteString where
+    sqlValueSyntax = defaultValueSyntax . MySQLBytes
+instance HasSqlValueSyntax MySQLValueSyntax L.ByteString where
+    sqlValueSyntax = sqlValueSyntax . L.toStrict
 
 instance HasSqlValueSyntax MySQLValueSyntax Bool where
     sqlValueSyntax = sqlValueSyntax . (\b -> if b then 1 else 0 :: Int8)
