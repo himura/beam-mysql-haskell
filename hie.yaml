@@ -3,5 +3,8 @@ cradle:
     - path: "./src"
       component: "beam-mysql-haskell:lib"
 
+    - path: "./examples"
+      component: "beam-mysql-haskell:exe:examples"
+
     - path: "./test"
       component: "beam-mysql-haskell:test:beam-mysql-haskell-test"

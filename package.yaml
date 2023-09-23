@@ -15,6 +15,11 @@ extra-source-files:
 - README.md
 - CHANGELOG.md
 
+flags:
+  build-examples:
+    default: False
+    manual: True
+
 dependencies:
 - base >= 4.10 && < 5
 - beam-core >= 0.10
@@ -69,7 +74,6 @@ ghc-options:
 - -Widentities
 - -Wincomplete-record-updates
 - -Wincomplete-uni-patterns
-- -Wmissing-export-lists
 - -Wmissing-home-modules
 - -Wpartial-fields
 - -Wredundant-constraints
@@ -78,6 +82,7 @@ library:
   source-dirs: src
   ghc-options:
   - -Werror
+  - -Wmissing-export-lists
 
 tests:
   beam-mysql-haskell-test:
@@ -92,3 +97,20 @@ tests:
     - tasty
     - tasty-th
     - tasty-hunit
+
+executables:
+  examples:
+    main:                Main.hs
+    source-dirs:         examples
+    when:
+      - condition: flag(build-examples)
+        then:
+          ghc-options:
+          - -threaded
+          - -rtsopts
+          - -with-rtsopts=-N
+          dependencies:
+          - beam-mysql-haskell
+          - resource-pool
+        else:
+          buildable: False
