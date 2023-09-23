@@ -31,6 +31,7 @@ flag build-examples
 
 library
   exposed-modules:
+      Database.Beam.MySQL
       Database.Beam.MySQL.Backend
       Database.Beam.MySQL.Connection
       Database.Beam.MySQL.FromField

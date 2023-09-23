@@ -3,7 +3,8 @@
 
 module Database.Beam.MySQL.Connection
     ( MySQL (..)
-    , MySQLM
+    , MySQLM (..)
+    , MySQLEnv (..)
     , runBeamMySQLMWithDebug
     , runBeamMySQLM
     ) where

@@ -5,8 +5,7 @@ import Data.Text qualified as T
 import Data.Text.IO qualified as T
 import Data.Time
 import Database.Beam
-import Database.Beam.MySQL.Connection
-import Database.MySQL.Base as MySQL
+import Database.Beam.MySQL as MySQL
 import StudentDB.Enum
 import StudentDB.Schema
 
