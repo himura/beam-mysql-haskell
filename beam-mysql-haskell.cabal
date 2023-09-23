@@ -71,28 +71,17 @@ library
   build-depends:
       base >=4.10 && <5
     , beam-core >=0.10
-    , binary >=0.8.3 && <0.9
-    , blaze-textual ==0.2.*
     , bytestring >=0.10.2.0 && <0.13
-    , bytestring-lexing ==0.5.*
-    , data-default-class >=0.1.2 && <0.2
-    , deepseq >=1.4.6 && <1.6
-    , dlist
-    , free
+    , dlist >=0.7.1.2 && <1.1
+    , free >=4.12 && <5.3
     , io-streams >=1.2 && <2.0
-    , memory >=0.14.4 && <0.19
-    , monad-loops ==0.4.*
-    , mtl
+    , mtl >=2.2.1 && <2.4
     , mysql-haskell >=1.0
-    , network >=2.3 && <4.0
-    , pem >=0.2.4 && <0.3
     , scientific ==0.3.*
     , text >=1.1 && <2.2
     , time >=1.5.0 && <1.13
-    , unliftio
-    , unliftio-core
-    , vector >=0.8 && <0.14
-    , word-compat ==0.0.*
+    , unliftio >=0.1.0.0 && <0.3
+    , unliftio-core >=0.1.0.0 && <0.3
   default-language: GHC2021
 
 executable examples
@@ -126,28 +115,17 @@ executable examples
   build-depends:
       base >=4.10 && <5
     , beam-core >=0.10
-    , binary >=0.8.3 && <0.9
-    , blaze-textual ==0.2.*
     , bytestring >=0.10.2.0 && <0.13
-    , bytestring-lexing ==0.5.*
-    , data-default-class >=0.1.2 && <0.2
-    , deepseq >=1.4.6 && <1.6
-    , dlist
-    , free
+    , dlist >=0.7.1.2 && <1.1
+    , free >=4.12 && <5.3
     , io-streams >=1.2 && <2.0
-    , memory >=0.14.4 && <0.19
-    , monad-loops ==0.4.*
-    , mtl
+    , mtl >=2.2.1 && <2.4
     , mysql-haskell >=1.0
-    , network >=2.3 && <4.0
-    , pem >=0.2.4 && <0.3
     , scientific ==0.3.*
     , text >=1.1 && <2.2
     , time >=1.5.0 && <1.13
-    , unliftio
-    , unliftio-core
-    , vector >=0.8 && <0.14
-    , word-compat ==0.0.*
+    , unliftio >=0.1.0.0 && <0.3
+    , unliftio-core >=0.1.0.0 && <0.3
   default-language: GHC2021
   if flag(build-examples)
     ghc-options: -threaded -rtsopts -with-rtsopts=-N
@@ -188,29 +166,18 @@ test-suite beam-mysql-haskell-test
       base >=4.10 && <5
     , beam-core >=0.10
     , beam-mysql-haskell
-    , binary >=0.8.3 && <0.9
-    , blaze-textual ==0.2.*
     , bytestring >=0.10.2.0 && <0.13
-    , bytestring-lexing ==0.5.*
-    , data-default-class >=0.1.2 && <0.2
-    , deepseq >=1.4.6 && <1.6
-    , dlist
-    , free
+    , dlist >=0.7.1.2 && <1.1
+    , free >=4.12 && <5.3
     , io-streams >=1.2 && <2.0
-    , memory >=0.14.4 && <0.19
-    , monad-loops ==0.4.*
-    , mtl
+    , mtl >=2.2.1 && <2.4
     , mysql-haskell >=1.0
-    , network >=2.3 && <4.0
-    , pem >=0.2.4 && <0.3
     , scientific ==0.3.*
     , tasty
     , tasty-hunit
     , tasty-th
     , text >=1.1 && <2.2
     , time >=1.5.0 && <1.13
-    , unliftio
-    , unliftio-core
-    , vector >=0.8 && <0.14
-    , word-compat ==0.0.*
+    , unliftio >=0.1.0.0 && <0.3
+    , unliftio-core >=0.1.0.0 && <0.3
   default-language: GHC2021
