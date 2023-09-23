@@ -116,8 +116,7 @@ unAgg :: ByteString -> Maybe MySQLAggregationSetQuantifierSyntax -> MySQLExpress
 unAgg fn quantifier expr =
     MySQLExpressionSyntax $
         emit fn
-            <> parens (maybe mempty (\q -> fromMySQLAggregationSetQuantifier q <> emit " ") quantifier)
-            <> fromMySQLExpression expr
+            <> parens (maybe mempty (\q -> fromMySQLAggregationSetQuantifier q <> emit " ") quantifier <> fromMySQLExpression expr)
 
 newtype MySQLAggregationSetQuantifierSyntax = MySQLAggregationSetQuantifierSyntax {fromMySQLAggregationSetQuantifier :: MySQLSyntax}
 
