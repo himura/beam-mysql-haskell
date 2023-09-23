@@ -29,6 +29,7 @@ import Database.Beam.Backend
 import Database.Beam.Backend.Internal.Compat (PreferExplicitSize)
 import Database.Beam.MySQL.FromField (FromField)
 import Database.Beam.MySQL.Syntax (MySQLCommandSyntax)
+import Database.Beam.Query (HasSqlInTable)
 import Database.Beam.Query.SQL92 (buildSql92Query')
 import GHC.TypeLits (TypeError)
 
@@ -43,6 +44,8 @@ type instance BeamSqlBackendSyntax MySQL = MySQLCommandSyntax
 
 instance HasQBuilder MySQL where
     buildSqlQuery = buildSql92Query' True
+
+instance HasSqlInTable MySQL
 
 instance FromBackendRow MySQL SqlNull
 instance FromBackendRow MySQL Bool
