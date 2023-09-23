@@ -27,6 +27,7 @@ source-repository head
 
 library
   exposed-modules:
+      Database.Beam.MySQL.Connection
       Database.Beam.MySQL.Syntax
       Database.Beam.MySQL.Syntax.Delete
       Database.Beam.MySQL.Syntax.Expression
@@ -70,15 +71,19 @@ library
     , data-default-class >=0.1.2 && <0.2
     , deepseq >=1.4.6 && <1.6
     , dlist
+    , free
     , io-streams >=1.2 && <2.0
     , memory >=0.14.4 && <0.19
     , monad-loops ==0.4.*
+    , mtl
     , mysql-haskell >=1.0
     , network >=2.3 && <4.0
     , pem >=0.2.4 && <0.3
     , scientific ==0.3.*
     , text >=1.1 && <2.2
     , time >=1.5.0 && <1.13
+    , unliftio
+    , unliftio-core
     , vector >=0.8 && <0.14
     , word-compat ==0.0.*
   default-language: GHC2021
@@ -121,9 +126,11 @@ test-suite beam-mysql-haskell-test
     , data-default-class >=0.1.2 && <0.2
     , deepseq >=1.4.6 && <1.6
     , dlist
+    , free
     , io-streams >=1.2 && <2.0
     , memory >=0.14.4 && <0.19
     , monad-loops ==0.4.*
+    , mtl
     , mysql-haskell >=1.0
     , network >=2.3 && <4.0
     , pem >=0.2.4 && <0.3
@@ -133,6 +140,8 @@ test-suite beam-mysql-haskell-test
     , tasty-th
     , text >=1.1 && <2.2
     , time >=1.5.0 && <1.13
+    , unliftio
+    , unliftio-core
     , vector >=0.8 && <0.14
     , word-compat ==0.0.*
   default-language: GHC2021
