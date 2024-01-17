@@ -3,59 +3,10 @@
 # For more information, please see the documentation at:
 #   https://docs.haskellstack.org/en/stable/lock_files
 
-packages:
-- completed:
-    hackage: beam-core-0.10.1.0@sha256:40abec08810f961e7b62d33f7ae92fac50513c6d47387cc6e1fb0c91ebe25d0e,5295
-    pantry-tree:
-      sha256: c56d0ac5021efa997c2ddfc95dd9f88e30ac1fea08eddd7922316cc2f050b38d
-      size: 2705
-  original:
-    hackage: beam-core-0.10.1.0
-- completed:
-    hackage: mysql-haskell-1.1.2@sha256:10031ae41f9750991ca7bdec441cdf2d10150c1e5747907b5c3bfd28d4d7c439,5078
-    pantry-tree:
-      sha256: 753121dc19ec0a995e57a76ea40cbeaa7b6324555ac05f88cc704496d3382e2f
-      size: 4968
-  original:
-    hackage: mysql-haskell-1.1.2
-- completed:
-    hackage: crypton-x509-1.7.6@sha256:c567657a705b6d6521f9dd2de999bf530d618ec00f3b939df76a41fb0fe94281,2339
-    pantry-tree:
-      sha256: 729e7db8dfc0a8b43e08bbd8d1387c9065e39beda6ac39e0fb9f10140810a3eb
-      size: 1080
-  original:
-    hackage: crypton-x509-1.7.6
-- completed:
-    hackage: crypton-x509-store-1.6.9@sha256:422b9b9f87a7382c66385d047615b16fc86a68c08ea22b1e0117c143a2d44050,1750
-    pantry-tree:
-      sha256: 87654d130a7f987ee139c821a1be45736d18df9fa4cb1142c4e054d3802338f3
-      size: 406
-  original:
-    hackage: crypton-x509-store-1.6.9
-- completed:
-    hackage: crypton-x509-system-1.6.7@sha256:023ed573d82983bc473a37a89e0434a085b413be9f68d07e085361056afd4637,1532
-    pantry-tree:
-      sha256: c0ca49e6a9537f3fdb7b47c5cfe93f7d744a369bf9d089f3c668b9c2d97402b7
-      size: 399
-  original:
-    hackage: crypton-x509-system-1.6.7
-- completed:
-    hackage: crypton-x509-validation-1.6.12@sha256:85989721b64be4b90de9f66ef641c26f57575cffed1a50d707065fb60176f386,2227
-    pantry-tree:
-      sha256: d4a0135f11218614fcd912cffaf54de8f749caca8696380e2589cbcfd64cc681
-      size: 639
-  original:
-    hackage: crypton-x509-validation-1.6.12
-- completed:
-    hackage: tls-1.7.1@sha256:3759864ce4452c31b7740ef181667dd3fdd3d136d7bdc01e0cf5200609973d5c,5566
-    pantry-tree:
-      sha256: 86f1b4c5d019628ceaa1a747af080a4ab43aba25ff7b7d9812ddbdf2a7dd8c00
-      size: 4897
-  original:
-    hackage: tls-1.7.1
+packages: []
 snapshots:
 - completed:
-    sha256: 9313df78f49519315342f4c51ffc5da12659d3735f8ac3c54a1fb98ff874474e
-    size: 640036
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/21/12.yaml
-  original: lts-21.12
+    sha256: 1b4c2669e26fa828451830ed4725e4d406acc25a1fa24fcc039465dd13d7a575
+    size: 714100
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/22/6.yaml
+  original: lts-22.6

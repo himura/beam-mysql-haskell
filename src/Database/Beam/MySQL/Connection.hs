@@ -9,9 +9,10 @@ module Database.Beam.MySQL.Connection
     , runBeamMySQLM
     ) where
 
+import Control.Monad (void)
 import Control.Monad.Free.Church (F (runF))
 import Control.Monad.IO.Unlift (MonadIO (..), MonadUnliftIO)
-import Control.Monad.Reader (MonadReader (ask), ReaderT (..), void)
+import Control.Monad.Reader (MonadReader (ask), ReaderT (..))
 import Data.ByteString.Lazy qualified as L
 import Data.DList qualified as DList
 import Data.Text (Text)
