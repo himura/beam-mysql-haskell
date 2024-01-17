@@ -89,7 +89,7 @@ instance (MonadUnliftIO m, MonadReader MySQLEnv m) => MonadBeam MySQL m where
                 bracket
                     (liftIO $ MySQL.queryStmt env.connection stmtId params)
                     (\(_, istream) -> liftIO $ consume_ istream)
-                    $ \(colDefs, istream) -> action (liftIO $ readRow colDefs istream)
+                    $ \(colDefs, istream) -> action (liftIO $ readRow (databaseTimeZone env) colDefs istream)
     runNoReturn (MySQLCommandQuery (MySQLSyntax cmd paramsDL)) = do
         env <- ask
         let query = buildSqlWithPlaceholder cmd
@@ -108,11 +108,11 @@ paramExtToParam tz = \case
     MySQLValue value -> value
     MySQLUTCTime utcTime -> MySQLTimeStamp $ utcToLocalTime tz utcTime
 
-readRow :: (FromBackendRow MySQL a) => [MySQL.ColumnDef] -> Streams.InputStream [MySQLValue] -> IO (Maybe a)
-readRow cdefs istream = do
+readRow :: (FromBackendRow MySQL a) => TimeZone -> [MySQL.ColumnDef] -> Streams.InputStream [MySQLValue] -> IO (Maybe a)
+readRow dbTz cdefs istream = do
     Streams.read istream >>= \case
         Nothing -> pure Nothing
-        Just rows -> case fromRow fromBackendRow cdefs rows of
+        Just rows -> case fromRow dbTz fromBackendRow cdefs rows of
             Left err -> throwIO err
             Right ok -> return $ Just ok
 
@@ -124,8 +124,8 @@ consume_ istream = loop
             Nothing -> return ()
             Just _ -> loop
 
-fromRow :: FromBackendRowM MySQL a -> [MySQL.ColumnDef] -> [MySQLValue] -> Either BeamRowReadError a
-fromRow (FromBackendRowM fromBackendRowF) =
+fromRow :: TimeZone -> FromBackendRowM MySQL a -> [MySQL.ColumnDef] -> [MySQLValue] -> Either BeamRowReadError a
+fromRow dbTz (FromBackendRowM fromBackendRowF) =
     runF fromBackendRowF finish step 0
   where
     finish a _ _ _ = Right a
@@ -140,7 +140,7 @@ fromRow (FromBackendRowM fromBackendRowF) =
     step (ParseOneField _) curIdx [] _ = Left $ BeamRowReadError (Just curIdx) $ ColumnNotEnoughColumns curIdx
     step (ParseOneField _) curIdx _ [] = Left $ BeamRowReadError (Just curIdx) $ ColumnNotEnoughColumns curIdx
     step (ParseOneField next) curIdx (cdef : cdefs) (v : vs) =
-        case fromField v of
+        case fromField dbTz v of
             Left (DecodeError _tyCon DecodeErrorUnexpectedNull) -> Left $ BeamRowReadError (Just curIdx) ColumnUnexpectedNull
             Left (DecodeError tyCon err) -> Left $ BeamRowReadError (Just curIdx) $ ColumnTypeMismatch (tyConName tyCon) (show $ MySQL.columnType cdef) $ "Failed to convert " ++ show err
             Right pv ->

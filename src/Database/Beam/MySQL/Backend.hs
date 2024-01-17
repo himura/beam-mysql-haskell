@@ -11,7 +11,7 @@ import Data.Int (Int16, Int32, Int64, Int8)
 import Data.Scientific (Scientific)
 import Data.Text (Text)
 import Data.Text.Lazy qualified as TL
-import Data.Time (Day, LocalTime, TimeOfDay)
+import Data.Time (Day, LocalTime, TimeOfDay, UTCTime)
 import Data.Word (Word16, Word32, Word64, Word8)
 import Database.Beam
     ( FromBackendRow (..)
@@ -75,6 +75,7 @@ instance FromBackendRow MySQL Text
 instance FromBackendRow MySQL TL.Text
 instance FromBackendRow MySQL String
 instance FromBackendRow MySQL LocalTime
+instance FromBackendRow MySQL UTCTime
 instance FromBackendRow MySQL Day
 instance FromBackendRow MySQL TimeOfDay
 
@@ -103,5 +104,6 @@ MYSQL_HAS_EQUALITY_CHECK (Text)
 MYSQL_HAS_EQUALITY_CHECK (TL.Text)
 MYSQL_HAS_EQUALITY_CHECK (String)
 MYSQL_HAS_EQUALITY_CHECK (LocalTime)
+MYSQL_HAS_EQUALITY_CHECK (UTCTime)
 MYSQL_HAS_EQUALITY_CHECK (Day)
 MYSQL_HAS_EQUALITY_CHECK (TimeOfDay)
