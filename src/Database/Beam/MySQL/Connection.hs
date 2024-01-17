@@ -18,6 +18,7 @@ import Data.DList qualified as DList
 import Data.Text (Text)
 import Data.Text qualified as T
 import Data.Text.Encoding qualified as T
+import Data.Time
 import Data.Typeable (tyConName)
 import Database.Beam
     ( FromBackendRow (fromBackendRow)
@@ -39,10 +40,7 @@ import Database.Beam.MySQL.Syntax
     ( MySQLCommandSyntax (MySQLCommandQuery)
     )
 import Database.Beam.MySQL.Syntax.Type
-    ( MySQLSyntax (MySQLSyntax)
-    , buildSqlWithPlaceholder
-    )
-import Database.MySQL.Base (MySQLConn, MySQLValue)
+import Database.MySQL.Base (MySQLConn, MySQLValue (..))
 import Database.MySQL.Base qualified as MySQL
 import System.IO.Streams qualified as Streams
 import UnliftIO.Exception (bracket, throwIO)
@@ -50,6 +48,7 @@ import UnliftIO.Exception (bracket, throwIO)
 data MySQLEnv = MySQLEnv
     { connection :: MySQLConn
     , logger :: Text -> IO ()
+    , databaseTimeZone :: TimeZone
     }
 
 newtype MySQLM a = MySQLM
@@ -60,15 +59,17 @@ newtype MySQLM a = MySQLM
 runBeamMySQLMWithDebug
     :: (Text -> IO ())
     -- ^ logger
+    -> TimeZone
     -> MySQLConn
     -> MySQLM a
     -> IO a
-runBeamMySQLMWithDebug logger connection act = do
+runBeamMySQLMWithDebug logger databaseTimeZone connection act = do
     let env = MySQLEnv{..}
     runReaderT (runMySQLM act) env
 
 runBeamMySQLM
-    :: MySQLConn
+    :: TimeZone
+    -> MySQLConn
     -> MySQLM a
     -> IO a
 runBeamMySQLM = runBeamMySQLMWithDebug (const (return ()))
@@ -77,7 +78,8 @@ instance (MonadUnliftIO m, MonadReader MySQLEnv m) => MonadBeam MySQL m where
     runReturningMany (MySQLCommandQuery (MySQLSyntax cmd paramsDL)) action = do
         env <- ask
         let query = buildSqlWithPlaceholder cmd
-            params = DList.toList paramsDL
+            paramExts = DList.toList paramsDL
+            params = map (paramExtToParam env.databaseTimeZone) paramExts
         liftIO $ env.logger $ "Query: " <> T.decodeUtf8 (L.toStrict query) <> "\n    Params: " <> T.pack (show params)
         bracket
             (liftIO $ MySQL.prepareStmtDetail env.connection $ MySQL.Query query)
@@ -91,7 +93,8 @@ instance (MonadUnliftIO m, MonadReader MySQLEnv m) => MonadBeam MySQL m where
     runNoReturn (MySQLCommandQuery (MySQLSyntax cmd paramsDL)) = do
         env <- ask
         let query = buildSqlWithPlaceholder cmd
-            params = DList.toList paramsDL
+            paramExts = DList.toList paramsDL
+            params = map (paramExtToParam env.databaseTimeZone) paramExts
         liftIO $ env.logger $ "Query: " <> T.decodeUtf8 (L.toStrict query) <> "\n    Params: " <> T.pack (show params)
         bracket
             (liftIO $ MySQL.prepareStmtDetail env.connection $ MySQL.Query query)
@@ -99,6 +102,11 @@ instance (MonadUnliftIO m, MonadReader MySQLEnv m) => MonadBeam MySQL m where
             $ \(ok@MySQL.StmtPrepareOK{stmtId}, pcols, rcols) -> do
                 liftIO $ env.logger $ "Prepare: OK=" <> T.pack (show ok) <> ", param columns=" <> T.pack (show pcols) <> ", result columns=" <> T.pack (show rcols)
                 liftIO . void $ MySQL.executeStmt env.connection stmtId params
+
+paramExtToParam :: TimeZone -> MySQLValueExt -> MySQLValue
+paramExtToParam tz = \case
+    MySQLValue value -> value
+    MySQLUTCTime utcTime -> MySQLTimeStamp $ utcToLocalTime tz utcTime
 
 readRow :: (FromBackendRow MySQL a) => [MySQL.ColumnDef] -> Streams.InputStream [MySQLValue] -> IO (Maybe a)
 readRow cdefs istream = do

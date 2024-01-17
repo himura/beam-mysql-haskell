@@ -1,11 +1,13 @@
 module Database.Beam.MySQL.Syntax.Type
     ( MySQLSyntax (..)
+    , MySQLValueExt (..)
     , buildSqlWithPlaceholder
 
       -- * emit
     , emit
     , emitBuilder
     , emitValue
+    , emitValueExt
 
       -- * utils
     , parens
@@ -22,11 +24,17 @@ import Data.ByteString.Lazy qualified as L
 import Data.DList qualified as DL
 import Data.Text qualified as T
 import Data.Text.Encoding qualified as T
+import Data.Time
 import Database.MySQL.Base (MySQLValue)
+
+data MySQLValueExt
+    = MySQLValue MySQLValue
+    | MySQLUTCTime UTCTime
+    deriving (Eq, Show)
 
 data MySQLSyntax = MySQLSyntax
     { buildSql :: SqlBuilder
-    , params :: DL.DList MySQLValue
+    , params :: DL.DList MySQLValueExt
     }
     deriving (Eq, Show)
 
@@ -37,7 +45,7 @@ instance Semigroup MySQLSyntax where
 instance Monoid MySQLSyntax where
     mempty = MySQLSyntax mempty mempty
 
-newtype SqlBuilder = SqlBuilder ((MySQLValue -> Builder) -> Builder)
+newtype SqlBuilder = SqlBuilder ((MySQLValueExt -> Builder) -> Builder)
 
 instance Show SqlBuilder where
     show = show . buildSqlWithPlaceholder
@@ -61,7 +69,10 @@ emitBuilder :: Builder -> MySQLSyntax
 emitBuilder builder = MySQLSyntax (SqlBuilder $ const builder) mempty
 
 emitValue :: MySQLValue -> MySQLSyntax
-emitValue v = MySQLSyntax (SqlBuilder ($ v)) (DL.singleton v)
+emitValue = emitValueExt . MySQLValue
+
+emitValueExt :: MySQLValueExt -> MySQLSyntax
+emitValueExt v = MySQLSyntax (SqlBuilder ($ v)) (DL.singleton v)
 
 parens :: MySQLSyntax -> MySQLSyntax
 parens a = emit "(" <> a <> emit ")"
