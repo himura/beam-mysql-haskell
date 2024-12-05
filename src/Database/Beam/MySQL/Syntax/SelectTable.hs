@@ -7,7 +7,9 @@ module Database.Beam.MySQL.Syntax.SelectTable
     , MySQLGroupingSyntax (..)
     , MySQLSelectSetQuantifierSyntax (..)
     , MySQLOrderingSyntax (..)
-    , MySQLSelectForUpdateSyntax (..)
+    , MySQLSelectLockingStrength (..)
+    , MySQLSelectLockingSyntax (..)
+    , mysqlSelectStmt
     ) where
 
 import Data.ByteString (ByteString)
@@ -62,19 +64,19 @@ instance IsSql92SelectSyntax MySQLSelectSyntax where
     selectStmt = mysqlSelectStmt Nothing
 
 mysqlSelectStmt
-    :: Maybe MySQLSelectForUpdateSyntax
+    :: Maybe MySQLSelectLockingSyntax
     -> MySQLSelectTableSyntax
     -> [MySQLOrderingSyntax]
     -> Maybe Integer
     -> Maybe Integer
     -> MySQLSelectSyntax
-mysqlSelectStmt forUpdate tbl ordering limit offset =
+mysqlSelectStmt locking tbl ordering limit offset =
     MySQLSelectSyntax $
         fromMySQLSelectTable tbl
             <> ssOrdering
             <> intClause " LIMIT " limit
             <> intClause " OFFSET " offset
-            <> maybe mempty fromMySQLSelectForUpdate forUpdate
+            <> maybe mempty fromMySQLSelectLockingSyntax locking
   where
     intClause prefix = maybe mempty (emitBuilder . (Builder.byteString prefix <>) . Builder.string8 . show)
 
@@ -168,7 +170,18 @@ instance IsSql92OrderingSyntax MySQLOrderingSyntax where
     descOrdering e = MySQLOrderingSyntax $ fromMySQLExpression e <> emit " DESC"
 
 -- TODO
-data MySQLSelectForUpdateSyntax = MySQLSelectForUpdateSyntax
+data MySQLSelectLockingStrength
+    = -- | @FOR SHARE@
+      MySQLSelectLockingStrengthShare
+    | -- | @FOR UPDATE@
+      MySQLSelectLockingStrengthUpdate
 
-fromMySQLSelectForUpdate :: MySQLSelectForUpdateSyntax -> MySQLSyntax
-fromMySQLSelectForUpdate = error "not implemented"
+newtype MySQLSelectLockingSyntax = MySQLSelectLockingSyntax {lockingStrength :: MySQLSelectLockingStrength}
+
+fromMySQLSelectLockingSyntax :: MySQLSelectLockingSyntax -> MySQLSyntax
+fromMySQLSelectLockingSyntax s =
+    emit " FOR "
+        <> ( case lockingStrength s of
+                MySQLSelectLockingStrengthShare -> emit "SHARE"
+                MySQLSelectLockingStrengthUpdate -> emit "UPDATE"
+           )

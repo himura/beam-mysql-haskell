@@ -35,6 +35,7 @@ library
       Database.Beam.MySQL.Backend
       Database.Beam.MySQL.Connection
       Database.Beam.MySQL.FromField
+      Database.Beam.MySQL.Full
       Database.Beam.MySQL.MySQLSpecific
       Database.Beam.MySQL.Syntax
       Database.Beam.MySQL.Syntax.Delete
