@@ -34,6 +34,7 @@ library
       Database.Beam.MySQL
       Database.Beam.MySQL.Backend
       Database.Beam.MySQL.Connection
+      Database.Beam.MySQL.Extra
       Database.Beam.MySQL.FromField
       Database.Beam.MySQL.Full
       Database.Beam.MySQL.MySQLSpecific
@@ -46,6 +47,7 @@ library
       Database.Beam.MySQL.Syntax.Type
       Database.Beam.MySQL.Syntax.Update
       Database.Beam.MySQL.Syntax.Value
+      Database.Beam.MySQL.Table.InformationSchema
   other-modules:
       Paths_beam_mysql_haskell
   hs-source-dirs:

@@ -6,6 +6,7 @@ import Data.Text.IO qualified as T
 import Data.Time
 import Database.Beam
 import Database.Beam.MySQL as MySQL
+import Database.Beam.MySQL.Extra
 import Database.Beam.MySQL.MySQLSpecific as MySQL
 import StudentDB.Enum
 import StudentDB.Schema
@@ -47,6 +48,13 @@ main = do
                     , Group 4 "ティーパーティー" releasedAt releasedAt
                     ]
 
+        Just highlander <-
+            runInsertLastRowReturning $
+                insert userDirectoryDb.tableSchool $
+                    insertExpressions
+                        [ School default_ (val_ "ハイランダー鉄道学園") currentTimestamp_ currentTimestamp_
+                        ]
+
         runInsert $
             insert userDirectoryDb.tableUser $
                 insertExpressions
@@ -58,6 +66,8 @@ main = do
                     , User default_ (val_ "natsume-iroha@ps.gehenna.ac.kv") (val_ UserActive) (val_ "棗イロハ") (val_ $ SchoolId 2) default_ default_
                     , User default_ (val_ "hifumidaisuki@trinity.ac.kv") (val_ UserActive) (val_ "阿慈谷ヒフミ") (val_ $ SchoolId 3) default_ default_
                     , User default_ (val_ "yurizono.seia@trinity.ac.kv") (val_ UserNotImplemented) (val_ "百合園セイア") (val_ $ SchoolId 3) default_ default_
+                    , User default_ (val_ "nozomi.tachibana@ccc.highlander.ac.kv") (val_ UserNotImplemented) (val_ "橘ノゾミ") (val_ (pk highlander)) default_ default_
+                    , User default_ (val_ "hikari.tachibana@ccc.highlander.ac.kv") (val_ UserNotImplemented) (val_ "橘ヒカリ") (val_ (pk highlander)) default_ default_
                     ]
 
         -- 対策委員会

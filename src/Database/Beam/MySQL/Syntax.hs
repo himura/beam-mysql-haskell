@@ -22,7 +22,7 @@ instance IsSql92Syntax MySQLCommandSyntax where
     selectCmd :: MySQLSelectSyntax -> MySQLCommandSyntax
     selectCmd = coerce
     insertCmd :: MySQLInsertSyntax -> MySQLCommandSyntax
-    insertCmd = coerce
+    insertCmd = coerce . fromMySQLInsert
     updateCmd :: MySQLUpdateSyntax -> MySQLCommandSyntax
     updateCmd = coerce
     deleteCmd :: MySQLDeleteSyntax -> MySQLCommandSyntax
