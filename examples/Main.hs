@@ -6,6 +6,7 @@ import Data.Text.IO qualified as T
 import Data.Time
 import Database.Beam
 import Database.Beam.MySQL as MySQL
+import Database.Beam.MySQL.MySQLSpecific as MySQL
 import StudentDB.Enum
 import StudentDB.Schema
 
@@ -97,6 +98,9 @@ main = do
                 school <- related_ userDirectoryDb.tableSchool user.schoolId
                 return (user, school)
     mapM_ (T.putStrLn . showResult) resultsFilt
+
+    ret <- runDB connPool $ runSelectReturningOne $ select $ pure MySQL.lastInsertId_
+    print ret
 
 showResult :: (User, School) -> T.Text
 showResult (user, school) =
