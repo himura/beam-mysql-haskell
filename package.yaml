@@ -19,6 +19,9 @@ flags:
   build-examples:
     default: False
     manual: True
+  use-test-container:
+    default: False
+    manual: True
 
 dependencies:
 - base >= 4.10 && < 5
@@ -75,7 +78,7 @@ library:
 
 tests:
   beam-mysql-haskell-test:
-    main:                Spec.hs
+    main:                Main.hs
     source-dirs:         test
     ghc-options:
     - -threaded
@@ -83,9 +86,16 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - beam-mysql-haskell
+    - resource-pool
     - tasty
     - tasty-th
     - tasty-hunit
+    when:
+    - condition: flag(use-test-container)
+      cpp-options:
+      - -DUSE_TEST_CONTAINER
+      dependencies:
+      - testcontainers
 
 executables:
   examples:

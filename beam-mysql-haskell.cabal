@@ -5,7 +5,7 @@ cabal-version: 1.12
 -- see: https://github.com/sol/hpack
 
 name:           beam-mysql-haskell
-version:        0.10.3.0
+version:        0.10.4.0
 synopsis:       Beam driver for mysql-haskell
 description:    Beam driver for the MySQL database with the pure haskell driver <https://hackage.haskell.org/package/mysql-haskell mysql-haskell>. Please see the README on GitHub at <https://github.com/himura/beam-mysql-haskell#readme>
 category:       Database
@@ -26,6 +26,10 @@ source-repository head
   location: https://github.com/himura/beam-mysql-haskell
 
 flag build-examples
+  manual: True
+  default: False
+
+flag use-test-container
   manual: True
   default: False
 
@@ -141,8 +145,13 @@ executable examples
 
 test-suite beam-mysql-haskell-test
   type: exitcode-stdio-1.0
-  main-is: Spec.hs
+  main-is: Main.hs
   other-modules:
+      Database.Beam.MySQL.Syntax.SelectTableSpec
+      Database.Beam.MySQL.Syntax.Spec
+      Database.Beam.MySQL.Test.Integration
+      Database.Beam.MySQL.Test.Schema
+      Database.Beam.MySQL.Test.Util
       Paths_beam_mysql_haskell
   hs-source-dirs:
       test
@@ -176,6 +185,7 @@ test-suite beam-mysql-haskell-test
     , io-streams >=1.2 && <2.0
     , mtl >=2.2.1 && <2.4
     , mysql-haskell >=1.0
+    , resource-pool
     , scientific ==0.3.*
     , tasty
     , tasty-hunit
@@ -185,3 +195,7 @@ test-suite beam-mysql-haskell-test
     , unliftio >=0.1.0.0 && <0.3
     , unliftio-core >=0.1.0.0 && <0.3
   default-language: GHC2021
+  if flag(use-test-container)
+    cpp-options: -DUSE_TEST_CONTAINER
+    build-depends:
+        testcontainers
