@@ -1,11 +1,11 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.36.0.
+-- This file has been generated from package.yaml by hpack version 0.37.0.
 --
 -- see: https://github.com/sol/hpack
 
 name:           beam-mysql-haskell
-version:        0.10.0.0
+version:        0.10.1.0
 synopsis:       Beam driver for mysql-haskell
 description:    Beam driver for the MySQL database with the pure haskell driver <https://hackage.haskell.org/package/mysql-haskell mysql-haskell>. Please see the README on GitHub at <https://github.com/himura/beam-mysql-haskell#readme>
 category:       Database
@@ -34,7 +34,9 @@ library
       Database.Beam.MySQL
       Database.Beam.MySQL.Backend
       Database.Beam.MySQL.Connection
+      Database.Beam.MySQL.Extra
       Database.Beam.MySQL.FromField
+      Database.Beam.MySQL.Full
       Database.Beam.MySQL.MySQLSpecific
       Database.Beam.MySQL.Syntax
       Database.Beam.MySQL.Syntax.Delete
@@ -45,6 +47,7 @@ library
       Database.Beam.MySQL.Syntax.Type
       Database.Beam.MySQL.Syntax.Update
       Database.Beam.MySQL.Syntax.Value
+      Database.Beam.MySQL.Table.InformationSchema
   other-modules:
       Paths_beam_mysql_haskell
   hs-source-dirs:

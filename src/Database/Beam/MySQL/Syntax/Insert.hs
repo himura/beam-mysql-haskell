@@ -9,18 +9,24 @@ import Database.Beam.MySQL.Syntax.SelectTable
 import Database.Beam.MySQL.Syntax.TableName
 import Database.Beam.MySQL.Syntax.Type
 
-newtype MySQLInsertSyntax = MySQLInsertSyntax {fromMySQLInsert :: MySQLSyntax}
+data MySQLInsertSyntax = MySQLInsertSyntax
+    { tableName :: MySQLTableNameSyntax
+    , fromMySQLInsert :: MySQLSyntax
+    }
 
 instance IsSql92InsertSyntax MySQLInsertSyntax where
     type Sql92InsertValuesSyntax MySQLInsertSyntax = MySQLInsertValuesSyntax
     type Sql92InsertTableNameSyntax MySQLInsertSyntax = MySQLTableNameSyntax
     insertStmt tblName fields values =
-        MySQLInsertSyntax $
-            emit "INSERT INTO "
-                <> fromMySQLTableName tblName
-                <> parens (commas (map quotedIdentifier fields))
-                <> emit " "
-                <> fromMySQLInsertValues values
+        MySQLInsertSyntax
+            { tableName = tblName
+            , fromMySQLInsert =
+                emit "INSERT INTO "
+                    <> fromMySQLTableName tblName
+                    <> parens (commas (map quotedIdentifier fields))
+                    <> emit " "
+                    <> fromMySQLInsertValues values
+            }
 
 newtype MySQLInsertValuesSyntax = MySQLInsertValuesSyntax {fromMySQLInsertValues :: MySQLSyntax}
 
