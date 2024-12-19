@@ -87,6 +87,21 @@ instance FromField Int64 where
         MySQLInt64 v -> pure v
         unexpected -> handleUnexpected unexpected
 
+-- | This instance does not support conversion from MySQLDecimal(Scientific)
+--   because the destination `Integer` type is unbounded. Allowing such a conversion
+--   could result in excessive memory usage if malicious input with huge exponents is provided.
+instance FromField Integer where
+    fromField = \case
+        MySQLInt8 v -> pure . fromIntegral $ v
+        MySQLInt16 v -> pure . fromIntegral $ v
+        MySQLInt32 v -> pure . fromIntegral $ v
+        MySQLInt64 v -> pure . fromIntegral $ v
+        MySQLInt8U v -> pure . fromIntegral $ v
+        MySQLInt16U v -> pure . fromIntegral $ v
+        MySQLInt32U v -> pure . fromIntegral $ v
+        MySQLInt64U v -> pure . fromIntegral $ v
+        unexpected -> handleUnexpected unexpected
+
 instance FromField Word8 where
     fromField = \case
         MySQLInt8U v -> pure v
