@@ -5,7 +5,7 @@ cabal-version: 1.12
 -- see: https://github.com/sol/hpack
 
 name:           beam-mysql-haskell
-version:        0.10.1.0
+version:        0.10.3.0
 synopsis:       Beam driver for mysql-haskell
 description:    Beam driver for the MySQL database with the pure haskell driver <https://hackage.haskell.org/package/mysql-haskell mysql-haskell>. Please see the README on GitHub at <https://github.com/himura/beam-mysql-haskell#readme>
 category:       Database

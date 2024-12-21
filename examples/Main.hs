@@ -49,7 +49,7 @@ main = do
                     ]
 
         Just highlander <-
-            runInsertLastRowReturning $
+            runInsertReturningOne $
                 insert userDirectoryDb.tableSchool $
                     insertExpressions
                         [ School default_ (val_ "ハイランダー鉄道学園") currentTimestamp_ currentTimestamp_
