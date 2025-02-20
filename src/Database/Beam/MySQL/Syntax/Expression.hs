@@ -11,12 +11,14 @@ where
 import Data.ByteString (ByteString)
 import Data.ByteString.Builder qualified as Builder
 import Data.Coerce (coerce)
+import Data.String
 import Data.Text (Text)
 import Data.Text.Encoding qualified as T
 import Database.Beam.Backend.SQL
 import {-# SOURCE #-} Database.Beam.MySQL.Syntax.SelectTable (MySQLSelectSyntax (..))
 import Database.Beam.MySQL.Syntax.Type
 import Database.Beam.MySQL.Syntax.Value (MySQLValueSyntax (..))
+import Database.Beam.Query.CustomSQL
 
 newtype MySQLExpressionSyntax = MySQLExpressionSyntax {fromMySQLExpression :: MySQLSyntax} deriving (Eq)
 
@@ -184,3 +186,13 @@ instance IsSql92ExtractFieldSyntax MySQLExtractFieldSyntax where
     dayField = MySQLExtractFieldSyntax $ emit "DAY"
     monthField = MySQLExtractFieldSyntax $ emit "MONTH"
     yearField = MySQLExtractFieldSyntax $ emit "YEAR"
+
+instance IsCustomSqlSyntax MySQLExpressionSyntax where
+    newtype CustomSqlSyntax MySQLExpressionSyntax = MySQLCustomSqlSyntax {fromMySQLCustomExpression :: MySQLSyntax}
+        deriving newtype (Semigroup, Monoid)
+
+    customExprSyntax = MySQLExpressionSyntax . fromMySQLCustomExpression
+    renderSyntax = MySQLCustomSqlSyntax . parens . fromMySQLExpression
+
+instance IsString (CustomSqlSyntax MySQLExpressionSyntax) where
+    fromString = MySQLCustomSqlSyntax . emit . fromString
