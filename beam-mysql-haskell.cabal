@@ -17,6 +17,8 @@ copyright:      2023 Takahiro Himura
 license:        MIT
 license-file:   LICENSE
 build-type:     Simple
+tested-with:
+    GHC ==9.8.4 || ==9.6.6
 extra-source-files:
     README.md
     CHANGELOG.md
