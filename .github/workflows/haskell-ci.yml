@@ -39,6 +39,20 @@ jobs:
             setup-method: ghcup
             allow-failure: false
       fail-fast: false
+    services:
+      mysql:
+        image: mysql:8.0-debian
+        ports:
+        - 3306:3306
+        # GitHub Actions does not support command options for service containers.
+        # https://github.com/actions/runner/pull/1152
+        # The following options is a workaround for this problem, and although extra arguments are passed to `sh`, it does work.
+        options: >
+          --health-cmd="mysqladmin ping" --health-interval=30s --health-timeout=10s --health-retries=5
+          -e MYSQL_ROOT_PASSWORD=root -e MYSQL_USER=test -e MYSQL_PASSWORD=test -e MYSQL_DATABASE=test
+          --entrypoint sh
+          mysql:8.0-debian
+          -c "exec docker-entrypoint.sh mysqld --default-authentication-plugin=mysql_native_password"
     steps:
       - name: apt-get install
         run: |
@@ -191,6 +205,9 @@ jobs:
           $CABAL v2-build $ARG_COMPILER --enable-tests --enable-benchmarks --constraint='tls <= 2.1.1' --constraint='data-default <= 0.7.1.3' --constraint='data-default-class <= 0.1.2.2' all
           $CABAL v2-test $ARG_COMPILER --enable-tests --enable-benchmarks --constraint='tls <= 2.1.1' --constraint='data-default <= 0.7.1.3' --constraint='data-default-class <= 0.1.2.2' all
           $CABAL v2-haddock --disable-documentation --haddock-all $ARG_COMPILER --with-haddock $HADDOCK --enable-tests --enable-benchmarks --constraint='tls <= 2.1.1' --constraint='data-default <= 0.7.1.3' --constraint='data-default-class <= 0.1.2.2' all
+        env:
+          MYSQL_HOST: mysql
+          MYSQL_PORT: 3306
       - name: save cache
         if: always()
         uses: actions/cache/save@v4
