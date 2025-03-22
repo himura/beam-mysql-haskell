@@ -13,6 +13,9 @@ module Database.Beam.MySQL.Syntax.Type
     , sepBy
     , commas
     , quotedIdentifier
+
+      -- * internal
+    , SqlBuilder (..)
     ) where
 
 import Data.ByteString (ByteString)
