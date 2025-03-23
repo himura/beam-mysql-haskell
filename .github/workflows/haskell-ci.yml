@@ -18,7 +18,7 @@ on:
   - pull_request
 jobs:
   linux:
-    name: Haskell-CI - Linux - ${{ matrix.compiler }}
+    name: Haskell-CI - Linux - ${{ matrix.compiler }} ${{ matrix.database }}
     runs-on: ubuntu-24.04
     timeout-minutes:
       60
@@ -33,18 +33,30 @@ jobs:
             compilerVersion: 9.8.4
             setup-method: ghcup
             allow-failure: false
+            # Override default_authentication_plugin to mysql_native_password for MySQL 8.0.
+            # GitHub Actions does not support command options for service containers. so we use a custom container to override it.
+            # https://github.com/actions/runner/pull/1152
+            # image repository: https://github.com/himura/docker-mysql-ci-tweak
+            database: ghcr.io/himura/mysql-ci-tweak:8.0-tweak
+            healthcheck: mysqladmin ping
+          - compiler: ghc-9.8.4
+            compilerKind: ghc
+            compilerVersion: 9.8.4
+            setup-method: ghcup
+            allow-failure: false
+            database: mariadb:11.7
+            healthcheck: healthcheck.sh --connect --innodb_initialized
           - compiler: ghc-9.6.6
             compilerKind: ghc
             compilerVersion: 9.6.6
             setup-method: ghcup
             allow-failure: false
+            database: ghcr.io/himura/mysql-ci-tweak:8.0-tweak
+            healthcheck: mysqladmin ping
       fail-fast: false
     services:
       mysql:
-        # GitHub Actions does not support command options for service containers. so we use a custom container to override default_authentication_plugin.
-        # https://github.com/actions/runner/pull/1152
-        # image repository: https://github.com/himura/docker-mysql-ci-tweak
-        image: ghcr.io/himura/mysql-ci-tweak:8.0-tweak
+        image: ${{ matrix.database }}
         ports:
         - 3306:3306
         env:
@@ -52,7 +64,7 @@ jobs:
           MYSQL_USER: test
           MYSQL_PASSWORD: test
           MYSQL_DATABASE: test
-        options: --health-cmd="mysqladmin ping" --health-interval=30s --health-timeout=10s --health-retries=5
+        options: --health-cmd="${{ matrix.healthcheck }}" --health-interval=5s --health-timeout=5s --health-retries=10
     steps:
       - name: apt-get install
         run: |
