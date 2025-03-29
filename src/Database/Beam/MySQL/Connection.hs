@@ -7,17 +7,14 @@ module Database.Beam.MySQL.Connection
     , MySQLEnv (..)
     , runBeamMySQLMWithDebug
     , runBeamMySQLM
+    , runNoReturn'
     ) where
 
 import Control.Monad (void)
 import Control.Monad.Free.Church (F (runF))
 import Control.Monad.IO.Unlift (MonadIO (..), MonadUnliftIO)
 import Control.Monad.Reader (MonadReader (ask), ReaderT (..))
-import Data.ByteString.Lazy qualified as L
 import Data.DList qualified as DList
-import Data.Text (Text)
-import Data.Text qualified as T
-import Data.Text.Encoding qualified as T
 import Data.Typeable (tyConName)
 import Database.Beam
     ( FromBackendRow (fromBackendRow)
@@ -35,6 +32,7 @@ import Database.Beam.MySQL.FromField
     , DecodeErrorDetail (DecodeErrorUnexpectedNull)
     , FromField (fromField)
     )
+import Database.Beam.MySQL.Logger
 import Database.Beam.MySQL.Syntax
     ( MySQLCommandSyntax (MySQLCommandQuery)
     )
@@ -49,7 +47,7 @@ import UnliftIO.Exception (bracket, throwIO)
 
 data MySQLEnv = MySQLEnv
     { connection :: MySQLConn
-    , logger :: Text -> IO ()
+    , logger :: LogEntry -> IO ()
     }
 
 newtype MySQLM a = MySQLM
@@ -58,7 +56,7 @@ newtype MySQLM a = MySQLM
     deriving newtype (Monad, Functor, Applicative, MonadIO, MonadFail, MonadUnliftIO, MonadReader MySQLEnv) -- MonadBase IO, MonadBaseControl IO, )
 
 runBeamMySQLMWithDebug
-    :: (Text -> IO ())
+    :: (LogEntry -> IO ())
     -- ^ logger
     -> MySQLConn
     -> MySQLM a
@@ -74,31 +72,8 @@ runBeamMySQLM
 runBeamMySQLM = runBeamMySQLMWithDebug (const (return ()))
 
 instance (MonadUnliftIO m, MonadReader MySQLEnv m) => MonadBeam MySQL m where
-    runReturningMany (MySQLCommandQuery (MySQLSyntax cmd paramsDL)) action = do
-        env <- ask
-        let query = buildSqlWithPlaceholder cmd
-            params = DList.toList paramsDL
-        liftIO $ env.logger $ "Query: " <> T.decodeUtf8 (L.toStrict query) <> "\n    Params: " <> T.pack (show params)
-        bracket
-            (liftIO $ MySQL.prepareStmtDetail env.connection $ MySQL.Query query)
-            (\(ok, _, _) -> liftIO $ MySQL.closeStmt env.connection $ MySQL.stmtId ok)
-            $ \(ok@MySQL.StmtPrepareOK{stmtId}, pcols, rcols) -> do
-                liftIO $ env.logger $ "Prepare: OK=" <> T.pack (show ok) <> ", param columns=" <> T.pack (show pcols) <> ", result columns=" <> T.pack (show rcols)
-                bracket
-                    (liftIO $ MySQL.queryStmt env.connection stmtId params)
-                    (\(_, istream) -> liftIO $ consume_ istream)
-                    $ \(colDefs, istream) -> action (liftIO $ readRow colDefs istream)
-    runNoReturn (MySQLCommandQuery (MySQLSyntax cmd paramsDL)) = do
-        env <- ask
-        let query = buildSqlWithPlaceholder cmd
-            params = DList.toList paramsDL
-        liftIO $ env.logger $ "Query: " <> T.decodeUtf8 (L.toStrict query) <> "\n    Params: " <> T.pack (show params)
-        bracket
-            (liftIO $ MySQL.prepareStmtDetail env.connection $ MySQL.Query query)
-            (\(ok, _, _) -> liftIO $ MySQL.closeStmt env.connection $ MySQL.stmtId ok)
-            $ \(ok@MySQL.StmtPrepareOK{stmtId}, pcols, rcols) -> do
-                liftIO $ env.logger $ "Prepare: OK=" <> T.pack (show ok) <> ", param columns=" <> T.pack (show pcols) <> ", result columns=" <> T.pack (show rcols)
-                liftIO . void $ MySQL.executeStmt env.connection stmtId params
+    runReturningMany = runReturningMany'
+    runNoReturn = void . runNoReturn'
 
 readRow :: (FromBackendRow MySQL a) => [MySQL.ColumnDef] -> Streams.InputStream [MySQLValue] -> IO (Maybe a)
 readRow cdefs istream = do
@@ -108,13 +83,52 @@ readRow cdefs istream = do
             Left err -> throwIO err
             Right ok -> return $ Just ok
 
-consume_ :: Streams.InputStream a -> IO ()
-consume_ istream = loop
+withPreparedStmt
+    :: (MonadUnliftIO m, MonadReader MySQLEnv m)
+    => MySQLCommandSyntax
+    -> ((MySQL.StmtPrepareOK, [MySQL.ColumnDef], [MySQL.ColumnDef]) -> m a)
+    -> m a
+withPreparedStmt query@(MySQLCommandQuery (MySQLSyntax cmd _)) action = do
+    env <- ask
+    let rquery = buildSqlWithPlaceholder cmd
+    liftIO $ env.logger $ PrepareStatement query rquery
+    bracket
+        (liftIO $ MySQL.prepareStmtDetail env.connection $ MySQL.Query rquery)
+        (\(ok, _, _) -> liftIO $ MySQL.closeStmt env.connection $ MySQL.stmtId ok)
+        $ \prepareOk -> do
+            liftIO $ env.logger $ PrepareStatementOK query rquery prepareOk
+            action prepareOk
+
+runReturningMany'
+    :: ( MonadUnliftIO m
+       , MonadReader MySQLEnv m
+       , FromBackendRow MySQL a
+       )
+    => MySQLCommandSyntax
+    -> (m (Maybe a) -> m b)
+    -> m b
+runReturningMany' query@(MySQLCommandQuery (MySQLSyntax _ paramsDL)) action = do
+    env <- ask
+    withPreparedStmt query $ \prepareOk -> do
+        let params = DList.toList paramsDL
+        bracket (liftIO $ runQuery env prepareOk params) (\(_, istream) -> liftIO $ Streams.skipToEof istream) $ \(colDefs, istream) -> do
+            liftIO $ env.logger $ QueryStatementOK query prepareOk params colDefs
+            action (liftIO $ readRow colDefs istream)
   where
-    loop =
-        Streams.read istream >>= \case
-            Nothing -> return ()
-            Just _ -> loop
+    runQuery env prepareOk@(MySQL.StmtPrepareOK{stmtId}, _, _) params = do
+        env.logger $ QueryStatement query prepareOk params
+        MySQL.queryStmt env.connection stmtId params
+
+runNoReturn' :: (MonadUnliftIO m, MonadReader MySQLEnv m) => MySQLCommandSyntax -> m MySQL.OK
+runNoReturn' query@(MySQLCommandQuery (MySQLSyntax _ paramsDL)) = do
+    env <- ask
+    withPreparedStmt query $ \prepareOk@(MySQL.StmtPrepareOK{stmtId}, _, _) -> do
+        let params = DList.toList paramsDL
+
+        liftIO $ env.logger $ ExecuteStatement query prepareOk params
+        ok <- liftIO $ MySQL.executeStmt env.connection stmtId params
+        liftIO $ env.logger $ ExecuteStatementOK query prepareOk params ok
+        return ok
 
 fromRow :: FromBackendRowM MySQL a -> [MySQL.ColumnDef] -> [MySQLValue] -> Either BeamRowReadError a
 fromRow (FromBackendRowM fromBackendRowF) =
