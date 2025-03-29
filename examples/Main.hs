@@ -3,10 +3,12 @@ module Main where
 import Data.Pool
 import Data.Text qualified as T
 import Data.Text.IO qualified as T
+import Data.Text.Lazy.IO qualified as TL
 import Data.Time
 import Database.Beam
 import Database.Beam.MySQL as MySQL
 import Database.Beam.MySQL.Extra
+import Database.Beam.MySQL.Logger qualified as MySQL
 import Database.Beam.MySQL.MySQLSpecific as MySQL
 import StudentDB.Enum
 import StudentDB.Schema
@@ -16,7 +18,7 @@ newMySQLPool connectInfo = newPool $ setNumStripes (Just 5) $ defaultPoolConfig 
 
 runDB :: Pool MySQL.MySQLConn -> MySQLM a -> IO a
 runDB pool act = do
-    withResource pool $ \conn -> MySQL.withTransaction conn $ runBeamMySQLMWithDebug T.putStrLn conn act
+    withResource pool $ \conn -> MySQL.withTransaction conn $ runBeamMySQLMWithDebug (maybe (pure ()) TL.putStrLn . MySQL.formatLogSimple) conn act
 
 main :: IO ()
 main = do

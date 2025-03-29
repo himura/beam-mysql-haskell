@@ -4,3 +4,6 @@ packages:
 extra-deps:
 - tasty-1.5
 - testcontainers-0.5.1.0
+flags:
+  beam-mysql-haskell:
+    build-examples: True
