@@ -4,12 +4,14 @@ module Database.Beam.MySQL
     , MySQLM
     , runBeamMySQLM
     , runBeamMySQLMWithDebug
+    , formatLogSimple
     , module M
     )
 where
 
 import Database.Beam.MySQL.Backend
 import Database.Beam.MySQL.Connection
+import Database.Beam.MySQL.Logger
 import Database.MySQL.Base as M
     ( ConnectInfo (..)
     , MySQLConn
