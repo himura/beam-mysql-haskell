@@ -3,17 +3,16 @@
 
 module Database.Beam.MySQL.Logger (LogEntry (..), formatLogSimple) where
 
+import Data.Binary.Put (runPut)
+import Data.ByteString.Builder qualified as BSBuilder
 import Data.ByteString.Lazy qualified as L
 import Data.Text.Lazy qualified as TL
 import Data.Text.Lazy.Builder qualified as Builder
 import Data.Text.Lazy.Encoding qualified as TL
-import Database.Beam.MySQL.Syntax (MySQLCommandSyntax)
-import Database.MySQL.Base
-    ( ColumnDef
-    , MySQLValue
-    , OK (..)
-    , StmtPrepareOK (..)
-    )
+import Database.Beam.MySQL.Syntax (MySQLCommandSyntax (..))
+import Database.Beam.MySQL.Syntax.Type (MySQLSyntax (..), SqlBuilder (..))
+import Database.MySQL.Base (ColumnDef, OK (..), StmtPrepareOK (..))
+import Database.MySQL.Base qualified as MySQL
 
 type PrepareOk = (StmtPrepareOK, [ColumnDef], [ColumnDef])
 
@@ -30,26 +29,27 @@ data LogEntry
     | QueryStatement
         { query :: MySQLCommandSyntax
         , prepareOk :: PrepareOk
-        , params :: [MySQLValue]
         }
     | QueryStatementOK
         { query :: MySQLCommandSyntax
         , prepareOk :: PrepareOk
-        , params :: [MySQLValue]
         , columnDefs :: [ColumnDef]
         }
     | ExecuteStatement
         { query :: MySQLCommandSyntax
         , prepareOk :: PrepareOk
-        , params :: [MySQLValue]
         }
     | ExecuteStatementOK
         { query :: MySQLCommandSyntax
         , prepareOk :: PrepareOk
-        , params :: [MySQLValue]
         , response :: OK
         }
     deriving stock (Show)
+
+buildSqlForLog :: SqlBuilder -> Builder.Builder
+buildSqlForLog (SqlBuilder builder) = Builder.fromLazyText . TL.decodeUtf8 . BSBuilder.toLazyByteString $ builder renderParam
+  where
+    renderParam = BSBuilder.lazyByteString . runPut . MySQL.putTextField
 
 formatLogSimple :: LogEntry -> Maybe TL.Text
 formatLogSimple =
@@ -58,9 +58,7 @@ formatLogSimple =
         PrepareStatementOK _ rquery (StmtPrepareOK{..}, _, _) ->
             Just $
                 mconcat
-                    [ "Prepare: "
-                    , Builder.fromLazyText (TL.decodeUtf8 rquery)
-                    , ", stmtId="
+                    [ "Prepare: stmtID="
                     , showB stmtId
                     , ", columns="
                     , showB stmtColumnCnt
@@ -68,24 +66,24 @@ formatLogSimple =
                     , showB stmtParamCnt
                     , ", warns="
                     , showB stmtWarnCnt
+                    , ": "
+                    , Builder.fromLazyText (TL.decodeUtf8 rquery)
                     ]
         QueryStatement{} -> Nothing
-        QueryStatementOK _ (StmtPrepareOK{stmtId}, _, _) params _ ->
+        QueryStatementOK (MySQLCommandQuery (MySQLSyntax query _)) (StmtPrepareOK{stmtId}, _, _) _ ->
             Just $
                 mconcat
                     [ "Query: stmtID="
                     , showB stmtId
-                    , ", params="
-                    , showB params
+                    , ": "
+                    , buildSqlForLog query
                     ]
         ExecuteStatement{} -> Nothing
-        ExecuteStatementOK _ (StmtPrepareOK{stmtId}, _, _) params OK{..} ->
+        ExecuteStatementOK (MySQLCommandQuery (MySQLSyntax query _)) (StmtPrepareOK{stmtId}, _, _) OK{..} ->
             Just $
                 mconcat
                     [ "Execute: stmtID="
                     , showB stmtId
-                    , ", params="
-                    , showB params
                     , ", affectedRows="
                     , showB okAffectedRows
                     , ", lastInsertID="
@@ -94,6 +92,8 @@ formatLogSimple =
                     , showB okStatus
                     , ", warningCnt="
                     , showB okWarningCnt
+                    , ": "
+                    , buildSqlForLog query
                     ]
   where
     showB :: forall a. (Show a) => a -> Builder.Builder

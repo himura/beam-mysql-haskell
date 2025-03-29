@@ -112,11 +112,11 @@ runReturningMany' query@(MySQLCommandQuery (MySQLSyntax _ paramsDL)) action = do
     withPreparedStmt query $ \prepareOk -> do
         let params = DList.toList paramsDL
         bracket (liftIO $ runQuery env prepareOk params) (\(_, istream) -> liftIO $ Streams.skipToEof istream) $ \(colDefs, istream) -> do
-            liftIO $ env.logger $ QueryStatementOK query prepareOk params colDefs
+            liftIO $ env.logger $ QueryStatementOK query prepareOk colDefs
             action (liftIO $ readRow colDefs istream)
   where
     runQuery env prepareOk@(MySQL.StmtPrepareOK{stmtId}, _, _) params = do
-        env.logger $ QueryStatement query prepareOk params
+        env.logger $ QueryStatement query prepareOk
         MySQL.queryStmt env.connection stmtId params
 
 runNoReturn' :: (MonadUnliftIO m, MonadReader MySQLEnv m) => MySQLCommandSyntax -> m MySQL.OK
@@ -125,9 +125,9 @@ runNoReturn' query@(MySQLCommandQuery (MySQLSyntax _ paramsDL)) = do
     withPreparedStmt query $ \prepareOk@(MySQL.StmtPrepareOK{stmtId}, _, _) -> do
         let params = DList.toList paramsDL
 
-        liftIO $ env.logger $ ExecuteStatement query prepareOk params
+        liftIO $ env.logger $ ExecuteStatement query prepareOk
         ok <- liftIO $ MySQL.executeStmt env.connection stmtId params
-        liftIO $ env.logger $ ExecuteStatementOK query prepareOk params ok
+        liftIO $ env.logger $ ExecuteStatementOK query prepareOk ok
         return ok
 
 fromRow :: FromBackendRowM MySQL a -> [MySQL.ColumnDef] -> [MySQLValue] -> Either BeamRowReadError a

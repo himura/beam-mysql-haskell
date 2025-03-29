@@ -28,6 +28,7 @@ flags:
 dependencies:
 - base >= 4.10 && < 5
 - beam-core >= 0.10
+- binary >= 0.8.3.0 && < 0.9
 - bytestring >=0.10.2.0 && <0.13
 - dlist >= 0.7.1.2 && <1.1
 - free >= 4.12 && <5.3
