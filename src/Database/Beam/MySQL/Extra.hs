@@ -1,10 +1,13 @@
 {-# LANGUAGE NoFieldSelectors #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module Database.Beam.MySQL.Extra (MonadBeamInsertReturningOne (..)) where
 
+import Data.Foldable
 import Data.Text qualified as T
 import Data.Text.Encoding qualified as T
 import Database.Beam
+import Database.Beam.Backend.SQL.BeamExtensions
 import Database.Beam.MySQL.Connection
 import Database.Beam.MySQL.MySQLSpecific
 import Database.Beam.MySQL.Syntax
@@ -30,6 +33,12 @@ data BeamMySQLFailedToObtainAutoIncrementColumn = BeamMySQLFailedToObtainAutoInc
     deriving stock (Eq, Show)
     deriving anyclass (Exception)
 
+-- | This instance retrieves the inserted row by querying with @last_insert_id()@.
+-- It detects the @auto_increment@ column from @information_schema.COLUMNS@
+-- and uses it to fetch the inserted row.
+--
+-- __Limitation__: The table must have an @auto_increment@ column.
+-- If not, 'BeamMySQLFailedToObtainAutoIncrementColumn' is thrown.
 instance MonadBeamInsertReturningOne MySQL MySQLM where
     runInsertReturningOne SqlInsertNoRows =
         return Nothing
@@ -61,3 +70,9 @@ detectAutoIncrementColumn tblName =
         columns <- all_ informationSchemaDb.tableColumns
         guard_ $ columns.tableSchema ==. maybe schema_ val_ (schemaName tblName) &&. columns.tableName ==. val_ (table tblName) &&. columns.extra `like_` "%auto_increment%"
         return columns.columnName
+
+-- | __Warning__: This instance is not safe for bulk inserts.
+-- When multiple rows are inserted, only the last inserted row is returned
+-- because it relies on @last_insert_id()@.
+instance MonadBeamInsertReturning MySQL MySQLM where
+    runInsertReturningList = fmap toList . runInsertReturningOne
