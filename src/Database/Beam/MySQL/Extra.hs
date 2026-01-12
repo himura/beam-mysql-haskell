@@ -33,6 +33,12 @@ data BeamMySQLFailedToObtainAutoIncrementColumn = BeamMySQLFailedToObtainAutoInc
     deriving stock (Eq, Show)
     deriving anyclass (Exception)
 
+-- | This instance retrieves the inserted row by querying with @last_insert_id()@.
+-- It detects the @auto_increment@ column from @information_schema.COLUMNS@
+-- and uses it to fetch the inserted row.
+--
+-- __Limitation__: The table must have an @auto_increment@ column.
+-- If not, 'BeamMySQLFailedToObtainAutoIncrementColumn' is thrown.
 instance MonadBeamInsertReturningOne MySQL MySQLM where
     runInsertReturningOne SqlInsertNoRows =
         return Nothing
