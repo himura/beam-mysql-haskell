@@ -2,13 +2,3 @@ no-tests-no-benchmarks: False
 unconstrained: False
 cabal-check: False
 haddock: False
-
--- mysql-haskell does not support a newer version of data-default
-constraint-set mysql-haskell-1.1.6
-  constraints: tls <= 2.1.1
-  constraints: data-default <= 0.7.1.3
-  constraints: data-default-class <= 0.1.2.2
-  tests: True
-  run-tests: True
-  benchmarks: True
-  haddock: True
