@@ -1,6 +1,6 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.37.0.
+-- This file has been generated from package.yaml by hpack version 0.38.1.
 --
 -- see: https://github.com/sol/hpack
 
@@ -44,6 +44,7 @@ library
       Database.Beam.MySQL.FromField
       Database.Beam.MySQL.Full
       Database.Beam.MySQL.Logger
+      Database.Beam.MySQL.MariaDBVector
       Database.Beam.MySQL.MySQLSpecific
       Database.Beam.MySQL.Syntax
       Database.Beam.MySQL.Syntax.Delete
@@ -84,6 +85,7 @@ library
     , beam-core >=0.10
     , binary >=0.8.3.0 && <0.9
     , bytestring >=0.10.2.0 && <0.13
+    , cereal
     , dlist >=0.7.1.2 && <1.1
     , free >=4.12 && <5.3
     , io-streams >=1.2 && <2.0
@@ -129,6 +131,7 @@ executable examples
     , beam-core >=0.10
     , binary >=0.8.3.0 && <0.9
     , bytestring >=0.10.2.0 && <0.13
+    , cereal
     , dlist >=0.7.1.2 && <1.1
     , free >=4.12 && <5.3
     , io-streams >=1.2 && <2.0
@@ -186,6 +189,7 @@ test-suite beam-mysql-haskell-test
     , beam-mysql-haskell
     , binary >=0.8.3.0 && <0.9
     , bytestring >=0.10.2.0 && <0.13
+    , cereal
     , dlist >=0.7.1.2 && <1.1
     , free >=4.12 && <5.3
     , io-streams >=1.2 && <2.0
