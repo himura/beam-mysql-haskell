@@ -11,7 +11,7 @@ description:         Beam driver for the MySQL database with the pure haskell dr
                      Please see the README on GitHub at <https://github.com/himura/beam-mysql-haskell#readme>
 category:            Database
 
-tested-with: GHC ==9.8.4 || ==9.6.6
+tested-with: GHC ==9.10.3 || ==9.8.4 || ==9.6.6
 
 extra-source-files:
 - README.md
