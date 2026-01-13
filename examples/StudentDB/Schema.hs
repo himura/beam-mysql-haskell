@@ -3,6 +3,7 @@
 module StudentDB.Schema where
 
 import Data.Bifunctor
+import Data.ByteString qualified as S
 import Data.Char
 import Data.Int
 import Data.List.NonEmpty qualified as NE
@@ -10,6 +11,7 @@ import Data.Text (Text)
 import Data.Text qualified as T
 import Data.Time
 import Database.Beam
+import Database.Beam.MySQL.MariaDBVector
 import Database.Beam.Schema.Tables (RenamableWithRule (renamingFields))
 import StudentDB.Enum
 
@@ -103,11 +105,32 @@ type UserGroupId = PrimaryKey UserGroupT Identity
 deriving instance Show UserGroupId
 deriving instance Eq UserGroupId
 
+data VectorT f = VectorT
+    { id :: Columnar f Int32
+    , v :: Columnar f MariaDBVector
+    }
+    deriving stock (Generic)
+    deriving anyclass (Beamable)
+type Vector = VectorT Identity
+deriving instance Show Vector
+deriving instance Eq Vector
+
+instance Table VectorT where
+    data PrimaryKey VectorT f
+        = VectorId (Columnar f Int32)
+        deriving stock (Generic)
+        deriving anyclass (Beamable)
+    primaryKey = VectorId . (.id)
+type VectorId = PrimaryKey VectorT Identity
+deriving instance Show VectorId
+deriving instance Eq VectorId
+
 data UserDirectoryDb f = UserDirectoryDb
     { tableUser :: f (TableEntity UserT)
     , tableSchool :: f (TableEntity SchoolT)
     , tableGroup :: f (TableEntity GroupT)
     , tableUserGroup :: f (TableEntity UserGroupT)
+    , tableV :: f (TableEntity VectorT)
     }
     deriving stock (Generic)
     deriving anyclass (Database be)
