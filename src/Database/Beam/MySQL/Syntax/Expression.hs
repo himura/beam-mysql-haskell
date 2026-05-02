@@ -184,6 +184,7 @@ instance IsSql92ExtractFieldSyntax MySQLExtractFieldSyntax where
     minutesField = MySQLExtractFieldSyntax $ emit "MINUTE"
     hourField = MySQLExtractFieldSyntax $ emit "HOUR"
     dayField = MySQLExtractFieldSyntax $ emit "DAY"
+    weekField = MySQLExtractFieldSyntax $ emit "WEEK"
     monthField = MySQLExtractFieldSyntax $ emit "MONTH"
     yearField = MySQLExtractFieldSyntax $ emit "YEAR"
 
