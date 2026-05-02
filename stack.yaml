@@ -1,9 +1,0 @@
-resolver: lts-24.27
-packages:
-- .
-extra-deps:
-- mysql-haskell-1.1.7
-- testcontainers-0.5.2.0
-flags:
-  beam-mysql-haskell:
-    build-examples: True

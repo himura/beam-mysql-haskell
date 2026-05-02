@@ -1,10 +1,19 @@
 cradle:
-  stack:
-    - path: "./src"
-      component: "beam-mysql-haskell:lib"
+  cabal:
+    - path: "src"
+      component: "lib:beam-mysql-haskell"
 
-    - path: "./examples"
+    - path: "examples/Main.hs"
       component: "beam-mysql-haskell:exe:examples"
 
-    - path: "./test"
+    - path: "examples/StudentDB/Enum.hs"
+      component: "beam-mysql-haskell:exe:examples"
+
+    - path: "examples/StudentDB/Schema.hs"
+      component: "beam-mysql-haskell:exe:examples"
+
+    - path: "examples/Paths_beam_mysql_haskell.hs"
+      component: "beam-mysql-haskell:exe:examples"
+
+    - path: "test"
       component: "beam-mysql-haskell:test:beam-mysql-haskell-test"
