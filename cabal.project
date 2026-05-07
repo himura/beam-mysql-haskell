@@ -1,0 +1,9 @@
+packages:
+  .
+
+allow-newer:
+  aeson-optics:base,
+
+constraints:
+  -- broken
+  testcontainers == 0.5.1.0,
