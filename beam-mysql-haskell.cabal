@@ -155,6 +155,10 @@ test-suite beam-mysql-haskell-test
       Database.Beam.MySQL.Syntax.SelectTableSpec
       Database.Beam.MySQL.Syntax.Spec
       Database.Beam.MySQL.Test.Integration
+      Database.Beam.MySQL.Test.Integration.Crud
+      Database.Beam.MySQL.Test.Integration.Fixture
+      Database.Beam.MySQL.Test.Integration.MySQLSpecific
+      Database.Beam.MySQL.Test.Integration.Setup
       Database.Beam.MySQL.Test.Schema
       Database.Beam.MySQL.Test.Util
       Paths_beam_mysql_haskell

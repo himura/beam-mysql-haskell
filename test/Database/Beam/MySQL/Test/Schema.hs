@@ -37,7 +37,7 @@ data PostT f = Post
     , authorId :: PrimaryKey UserT f
     , title :: Columnar f Text
     , body :: Columnar f Text
-    , createdAt :: Columnar f UTCTime
+    , createdAt :: Columnar f LocalTime
     }
     deriving stock (Generic)
     deriving anyclass (Beamable)
@@ -60,7 +60,7 @@ data CommentT f = Comment
     , postId :: PrimaryKey PostT f
     , authorId :: PrimaryKey UserT f
     , body :: Columnar f Text
-    , createdAt :: Columnar f UTCTime
+    , createdAt :: Columnar f LocalTime
     }
     deriving stock (Generic)
     deriving anyclass (Beamable)
