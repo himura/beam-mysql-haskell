@@ -3,18 +3,11 @@ module Database.Beam.MySQL.Test.Integration where
 import Control.Exception
 import Control.Monad
 import Database.Beam
-import Database.Beam.MySQL
+import Database.Beam.MySQL.Test.Connection
 import Database.Beam.MySQL.Test.Schema
 import Database.MySQL.Base qualified as MySQL
 import Test.Tasty
 import Test.Tasty.HUnit
-
-withConnection :: IO MySQL.ConnectInfo -> (IO MySQL.MySQLConn -> TestTree) -> TestTree
-withConnection ioConnInfo = withResource doConnect MySQL.close
-  where
-    doConnect = do
-        connInfo <- ioConnInfo
-        MySQL.connect connInfo
 
 setup :: IO MySQL.MySQLConn -> IO MySQL.MySQLConn
 setup ioConn = do
@@ -33,9 +26,6 @@ teardown conn = do
 
 withTestDB :: IO MySQL.MySQLConn -> (MySQL.MySQLConn -> Assertion) -> Assertion
 withTestDB ioConn = bracket (setup ioConn) teardown
-
-runDB :: MySQL.MySQLConn -> MySQLM a -> IO a
-runDB conn = MySQL.withTransaction conn . runBeamMySQLM conn
 
 integrationTests :: IO MySQL.ConnectInfo -> TestTree
 integrationTests ioConnInfo =

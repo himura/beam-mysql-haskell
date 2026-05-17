@@ -41,6 +41,7 @@ library
       Database.Beam.MySQL.Backend
       Database.Beam.MySQL.Connection
       Database.Beam.MySQL.Extra
+      Database.Beam.MySQL.Extra.MariaDBVector
       Database.Beam.MySQL.FromField
       Database.Beam.MySQL.Full
       Database.Beam.MySQL.Logger
@@ -152,10 +153,15 @@ test-suite beam-mysql-haskell-test
   type: exitcode-stdio-1.0
   main-is: Main.hs
   other-modules:
+      Database.Beam.MySQL.Extra.MariaDBVectorIntegrationSpec
+      Database.Beam.MySQL.Extra.MariaDBVectorSpec
+      Database.Beam.MySQL.Extra.Schema
       Database.Beam.MySQL.Syntax.SelectTableSpec
       Database.Beam.MySQL.Syntax.Spec
+      Database.Beam.MySQL.Test.Connection
       Database.Beam.MySQL.Test.Integration
       Database.Beam.MySQL.Test.Schema
+      Database.Beam.MySQL.Test.ServerFlavor
       Database.Beam.MySQL.Test.Util
       Paths_beam_mysql_haskell
   hs-source-dirs:
@@ -193,6 +199,7 @@ test-suite beam-mysql-haskell-test
     , mysql-haskell >=1.0
     , resource-pool
     , scientific ==0.3.*
+    , tagged
     , tasty
     , tasty-hunit
     , tasty-th
