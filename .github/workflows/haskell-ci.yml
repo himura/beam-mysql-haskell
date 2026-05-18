@@ -40,6 +40,7 @@ jobs:
             # image repository: https://github.com/himura/docker-mysql-ci-tweak
             database: ghcr.io/himura/mysql-ci-tweak:8.0-tweak
             healthcheck: mysqladmin ping
+            server-flavor: mysql
           - compiler: ghc-9.10.3
             compilerKind: ghc
             compilerVersion: 9.10.3
@@ -47,6 +48,7 @@ jobs:
             allow-failure: false
             database: mariadb:11.7
             healthcheck: healthcheck.sh --connect --innodb_initialized
+            server-flavor: mariadb
           - compiler: ghc-9.8.4
             compilerKind: ghc
             compilerVersion: 9.8.4
@@ -54,6 +56,7 @@ jobs:
             allow-failure: false
             database: mariadb:11.7
             healthcheck: healthcheck.sh --connect --innodb_initialized
+            server-flavor: mariadb
           - compiler: ghc-9.6.6
             compilerKind: ghc
             compilerVersion: 9.6.6
@@ -61,6 +64,7 @@ jobs:
             allow-failure: false
             database: ghcr.io/himura/mysql-ci-tweak:8.0-tweak
             healthcheck: mysqladmin ping
+            server-flavor: mysql
       fail-fast: false
     services:
       mysql:
@@ -216,6 +220,7 @@ jobs:
         env:
           MYSQL_HOST: mysql
           MYSQL_PORT: 3306
+          TASTY_SERVER_FLAVOR: ${{ matrix.server-flavor }}
       - name: save cache
         if: always()
         uses: actions/cache/save@v4
