@@ -1,11 +1,11 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.37.0.
+-- This file has been generated from package.yaml by hpack version 0.39.3.
 --
 -- see: https://github.com/sol/hpack
 
 name:           beam-mysql-haskell
-version:        0.10.4.0
+version:        0.11.0.0
 synopsis:       Beam driver for mysql-haskell
 description:    Beam driver for the MySQL database with the pure haskell driver <https://hackage.haskell.org/package/mysql-haskell mysql-haskell>. Please see the README on GitHub at <https://github.com/himura/beam-mysql-haskell#readme>
 category:       Database
@@ -81,7 +81,7 @@ library
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -Werror -Wmissing-export-lists
   build-depends:
       base >=4.10 && <5
-    , beam-core >=0.10
+    , beam-core >=0.11.0.0
     , binary >=0.8.3.0 && <0.9
     , bytestring >=0.10.2.0 && <0.13
     , dlist >=0.7.1.2 && <1.1
@@ -126,7 +126,7 @@ executable examples
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
       base >=4.10 && <5
-    , beam-core >=0.10
+    , beam-core >=0.11.0.0
     , binary >=0.8.3.0 && <0.9
     , bytestring >=0.10.2.0 && <0.13
     , dlist >=0.7.1.2 && <1.1
@@ -182,7 +182,7 @@ test-suite beam-mysql-haskell-test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.10 && <5
-    , beam-core >=0.10
+    , beam-core >=0.11.0.0
     , beam-mysql-haskell
     , binary >=0.8.3.0 && <0.9
     , bytestring >=0.10.2.0 && <0.13
