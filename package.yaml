@@ -90,6 +90,7 @@ tests:
     dependencies:
     - beam-mysql-haskell
     - resource-pool
+    - tagged
     - tasty
     - tasty-th
     - tasty-hunit
