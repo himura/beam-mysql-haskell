@@ -8,4 +8,10 @@ and this project adheres to the
 
 ## Unreleased
 
+## 0.11.1.0 - 2026-05-31
+
+### Added
+
+- `Database.Beam.MySQL.Extra.MariaDBVector`: support for MariaDB `VECTOR` columns.
+
 ## 0.1.0.0 - YYYY-MM-DD
