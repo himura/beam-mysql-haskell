@@ -6,6 +6,7 @@ import Control.Exception
 import Control.Monad
 import Database.Beam.MySQL.Extra.MariaDBVectorIntegrationSpec qualified
 import Database.Beam.MySQL.Extra.MariaDBVectorSpec qualified
+import Database.Beam.MySQL.FullIntegrationSpec qualified
 import Database.Beam.MySQL.Syntax.Spec qualified
 import Database.Beam.MySQL.Test.Integration qualified
 import Database.Beam.MySQL.Test.ServerFlavor (serverFlavorOption)
@@ -54,6 +55,7 @@ integrationTests ioConnInfo =
         "integration"
         [ Database.Beam.MySQL.Test.Integration.integrationTests ioConnInfo
         , Database.Beam.MySQL.Extra.MariaDBVectorIntegrationSpec.integrationTests ioConnInfo
+        , Database.Beam.MySQL.FullIntegrationSpec.integrationTests ioConnInfo
         ]
 
 #ifdef USE_TEST_CONTAINER

@@ -8,6 +8,24 @@ and this project adheres to the
 
 ## Unreleased
 
+### Added
+
+- `MySQLSelectLockingOption` for `NOWAIT`, `SKIP LOCKED` and `WAIT n` in
+  locking reads.
+- `MySQLSelectLockingStrengthLockInShareMode` and `lockingInShareMode_` for
+  `LOCK IN SHARE MODE`.
+- `Database.Beam.MySQL.Full` re-exports `MySQLSelectLockingStrength` and
+  `MySQLSelectLockingOption`.
+- `docs/locking-reads.md`: syntax and compatibility of locking reads in MySQL
+  and MariaDB.
+
+### Changed
+
+- **Breaking:** `lockingFor_` takes a `Maybe MySQLSelectLockingOption`
+  argument after the lock strength.
+- **Breaking:** `MySQLSelectLockingSyntax` is now a record with
+  `lockingStrength` and `lockingOption` fields.
+
 ## 0.11.1.0 - 2026-05-31
 
 ### Added

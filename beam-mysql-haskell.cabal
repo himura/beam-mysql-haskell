@@ -1,6 +1,6 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.39.3.
+-- This file has been generated from package.yaml by hpack version 0.39.6.
 --
 -- see: https://github.com/sol/hpack
 
@@ -156,6 +156,7 @@ test-suite beam-mysql-haskell-test
       Database.Beam.MySQL.Extra.MariaDBVectorIntegrationSpec
       Database.Beam.MySQL.Extra.MariaDBVectorSpec
       Database.Beam.MySQL.Extra.Schema
+      Database.Beam.MySQL.FullIntegrationSpec
       Database.Beam.MySQL.Syntax.SelectTableSpec
       Database.Beam.MySQL.Syntax.Spec
       Database.Beam.MySQL.Test.Connection

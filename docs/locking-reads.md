@@ -21,6 +21,29 @@ Last verified: 2026-09-13.
 - `OF tbl_name` and multiple locking clauses (MySQL 8.0.1+ only) are not
   supported yet.
 
+## beam-mysql-haskell API
+
+`lockingFor_ strength option` appends `<strength> [<option>]` to the `SELECT`
+statement, after `LIMIT` / `OFFSET`. Both servers accept the clause in that
+position.
+
+| Value | Rendered SQL |
+|---|---|
+| `MySQLSelectLockingStrengthUpdate` | `FOR UPDATE` |
+| `MySQLSelectLockingStrengthShare` | `FOR SHARE` |
+| `MySQLSelectLockingStrengthLockInShareMode` | `LOCK IN SHARE MODE` |
+| `MySQLSelectLockingOptionNoWait` | `NOWAIT` |
+| `MySQLSelectLockingOptionSkipLocked` | `SKIP LOCKED` |
+| `MySQLSelectLockingOptionWait n` | `WAIT n` |
+
+Shorthands without an option:
+
+| Function | Rendered SQL |
+|---|---|
+| `lockingForUpdate_` | `FOR UPDATE` |
+| `lockingForShare_` | `FOR SHARE` |
+| `lockingInShareMode_` | `LOCK IN SHARE MODE` |
+
 ## SQL standard
 
 The SQL:2016 Foundation grammar has only the *updatability clause* of a cursor

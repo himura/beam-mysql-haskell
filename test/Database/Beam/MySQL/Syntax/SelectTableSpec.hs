@@ -4,6 +4,7 @@ import Data.ByteString.Lazy qualified as L
 import Data.Int
 import Database.Beam
 import Database.Beam.MySQL
+import Database.Beam.MySQL.Full
 import Database.Beam.MySQL.Syntax.SelectTable
 import Database.Beam.MySQL.Test.Schema
 import Database.Beam.MySQL.Test.Util
@@ -95,6 +96,41 @@ tests =
 
                 let q2 = select $ limit_ 10 $ offset_ 120 $ all_ blogDb.tableUser
                 assertSqlSelect q2 "SELECT `t0`.`id` AS `res0`,`t0`.`name` AS `res1` FROM `user` AS `t0` LIMIT 10 OFFSET 120" []
+            ]
+        , testGroup
+            "locking"
+            [ testCase "lockingForUpdate_" $ do
+                let q = select $ lockingForUpdate_ $ all_ blogDb.tableUser
+                assertSqlSelect q "SELECT `t0`.`id` AS `res0`,`t0`.`name` AS `res1` FROM `user` AS `t0` FOR UPDATE" []
+            , testCase "lockingForShare_" $ do
+                let q = select $ lockingForShare_ $ all_ blogDb.tableUser
+                assertSqlSelect q "SELECT `t0`.`id` AS `res0`,`t0`.`name` AS `res1` FROM `user` AS `t0` FOR SHARE" []
+            , testCase "lockingInShareMode_" $ do
+                let q = select $ lockingInShareMode_ $ all_ blogDb.tableUser
+                assertSqlSelect q "SELECT `t0`.`id` AS `res0`,`t0`.`name` AS `res1` FROM `user` AS `t0` LOCK IN SHARE MODE" []
+            , testCase "lockingFor_ without option" $ do
+                let q = select $ lockingFor_ MySQLSelectLockingStrengthUpdate Nothing $ all_ blogDb.tableUser
+                assertSqlSelect q "SELECT `t0`.`id` AS `res0`,`t0`.`name` AS `res1` FROM `user` AS `t0` FOR UPDATE" []
+            , testCase "lockingFor_ with NOWAIT" $ do
+                let q = select $ lockingFor_ MySQLSelectLockingStrengthUpdate (Just MySQLSelectLockingOptionNoWait) $ all_ blogDb.tableUser
+                assertSqlSelect q "SELECT `t0`.`id` AS `res0`,`t0`.`name` AS `res1` FROM `user` AS `t0` FOR UPDATE NOWAIT" []
+            , testCase "lockingFor_ with SKIP LOCKED" $ do
+                let q = select $ lockingFor_ MySQLSelectLockingStrengthShare (Just MySQLSelectLockingOptionSkipLocked) $ all_ blogDb.tableUser
+                assertSqlSelect q "SELECT `t0`.`id` AS `res0`,`t0`.`name` AS `res1` FROM `user` AS `t0` FOR SHARE SKIP LOCKED" []
+            , testCase "lockingFor_ with WAIT n" $ do
+                let q = select $ lockingFor_ MySQLSelectLockingStrengthLockInShareMode (Just (MySQLSelectLockingOptionWait 5)) $ all_ blogDb.tableUser
+                assertSqlSelect q "SELECT `t0`.`id` AS `res0`,`t0`.`name` AS `res1` FROM `user` AS `t0` LOCK IN SHARE MODE WAIT 5" []
+            , testCase "locking clause follows WHERE, ORDER BY, LIMIT and OFFSET" $ do
+                let q =
+                        select $
+                            lockingFor_ MySQLSelectLockingStrengthUpdate (Just MySQLSelectLockingOptionSkipLocked) $
+                                limit_ 10 $
+                                    offset_ 20 $
+                                        orderBy_ (\user -> asc_ user.id) $ do
+                                            user <- all_ blogDb.tableUser
+                                            guard_ $ user.name ==. val_ "Test User"
+                                            return user
+                assertSqlSelect q "SELECT `t0`.`id` AS `res0`,`t0`.`name` AS `res1` FROM `user` AS `t0` WHERE (`t0`.`name`) = (?) ORDER BY `t0`.`id` ASC LIMIT 10 OFFSET 20 FOR UPDATE SKIP LOCKED" [MySQLText "Test User"]
             ]
         ]
 

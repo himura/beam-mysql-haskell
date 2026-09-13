@@ -8,6 +8,7 @@ module Database.Beam.MySQL.Syntax.SelectTable
     , MySQLSelectSetQuantifierSyntax (..)
     , MySQLOrderingSyntax (..)
     , MySQLSelectLockingStrength (..)
+    , MySQLSelectLockingOption (..)
     , MySQLSelectLockingSyntax (..)
     , mysqlSelectStmt
     ) where
@@ -169,19 +170,48 @@ instance IsSql92OrderingSyntax MySQLOrderingSyntax where
     ascOrdering e = MySQLOrderingSyntax $ fromMySQLExpression e <> emit " ASC"
     descOrdering e = MySQLOrderingSyntax $ fromMySQLExpression e <> emit " DESC"
 
--- TODO
+-- | Lock strength of a locking read.
+--
+-- Each constructor is rendered verbatim. Which ones are accepted depends on
+-- the server; see "Database.Beam.MySQL.Full".
 data MySQLSelectLockingStrength
-    = -- | @FOR SHARE@
+    = -- | @FOR SHARE@ (MySQL 8.0.1+ only; MariaDB does not support it)
       MySQLSelectLockingStrengthShare
     | -- | @FOR UPDATE@
       MySQLSelectLockingStrengthUpdate
+    | -- | @LOCK IN SHARE MODE@
+      MySQLSelectLockingStrengthLockInShareMode
+    deriving stock (Eq, Show)
 
-newtype MySQLSelectLockingSyntax = MySQLSelectLockingSyntax {lockingStrength :: MySQLSelectLockingStrength}
+-- | What a locking read does when a row is locked by another transaction.
+--
+-- Each constructor is rendered verbatim. Which ones are accepted depends on
+-- the server; see "Database.Beam.MySQL.Full".
+data MySQLSelectLockingOption
+    = -- | @NOWAIT@: fail immediately
+      MySQLSelectLockingOptionNoWait
+    | -- | @SKIP LOCKED@: exclude locked rows from the result
+      MySQLSelectLockingOptionSkipLocked
+    | -- | @WAIT n@: wait at most @n@ seconds (MariaDB only)
+      MySQLSelectLockingOptionWait Word
+    deriving stock (Eq, Show)
+
+data MySQLSelectLockingSyntax = MySQLSelectLockingSyntax
+    { lockingStrength :: MySQLSelectLockingStrength
+    , lockingOption :: Maybe MySQLSelectLockingOption
+    }
+    deriving stock (Eq, Show)
 
 fromMySQLSelectLockingSyntax :: MySQLSelectLockingSyntax -> MySQLSyntax
-fromMySQLSelectLockingSyntax s =
-    emit " FOR "
-        <> ( case lockingStrength s of
-                MySQLSelectLockingStrengthShare -> emit "SHARE"
-                MySQLSelectLockingStrengthUpdate -> emit "UPDATE"
-           )
+fromMySQLSelectLockingSyntax MySQLSelectLockingSyntax{..} =
+    strength lockingStrength <> maybe mempty option lockingOption
+  where
+    strength = \case
+        MySQLSelectLockingStrengthShare -> emit " FOR SHARE"
+        MySQLSelectLockingStrengthUpdate -> emit " FOR UPDATE"
+        MySQLSelectLockingStrengthLockInShareMode -> emit " LOCK IN SHARE MODE"
+
+    option = \case
+        MySQLSelectLockingOptionNoWait -> emit " NOWAIT"
+        MySQLSelectLockingOptionSkipLocked -> emit " SKIP LOCKED"
+        MySQLSelectLockingOptionWait n -> emitBuilder $ Builder.byteString " WAIT " <> Builder.wordDec n
